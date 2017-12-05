@@ -13,6 +13,12 @@ int main (int ac, char **av)
 	struct passwd *person;
 	struct group *grp;
 	//info = malloc(sizeof(struct stat));
+
+	if (ac == 1)
+	{
+		perror("File Open");
+		exit(EXIT_FAILURE);
+	}
 	stat(av[1], &info);
 	person = getpwuid(info.st_uid);
 	grp = getgrgid(info.st_gid);

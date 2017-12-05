@@ -1,6 +1,9 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <string.h>
+#include <stdlib.h>
+#include <errno.h>
 
 int main(int ac, char **av)
 {
@@ -10,8 +13,8 @@ int main(int ac, char **av)
 	p = opendir(av[1]);
 	if (p == NULL)
 	{
-		printf("Error!\n");
-		return 0;
+		printf("Error: %s\n", strerror(errno));
+		exit(EXIT_FAILURE);
 	}
 	while ((read = readdir(p)) != NULL)
 	{
