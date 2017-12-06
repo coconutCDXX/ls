@@ -25,7 +25,20 @@ typedef struct		s_opt
 	bool			opt_R;
 	bool			opt_r;
 	bool			opt_t;
-	
 }					t_opt;
+
+typedef struct		s_ll
+{
+	int			dir_cont;
+	char			*str_rights;
+	int			file_type;
+	char			*user_name;
+	char			*grp_name;
+	int			bytes;
+	char			*date;
+	char			*filename;
+	struct s_ll	*next;
+	struct s_ll	*tree;
+}				q_ll;
 
 #endif
