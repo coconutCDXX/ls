@@ -36,9 +36,11 @@ int		main(int ac, char **av)
 
 void	read_options(int ac, char **av, char *options)
 {
-	t_opt *struct_opt;
+	t_opt	*struct_opt;
+	t_info	*struct_info;
 
-	struct_opt = (t_opt *)malloc(sizeof(*struct_opt));
+	struct_info = (t_info*)malloc(sizeof(*struct_info));
+	struct_opt = (t_opt*)malloc(sizeof(*struct_opt));
 	if (ft_strchr(options, 'a'))
 	struct_opt.opt_a = TRUE;
 	if (ft_strchr(options, 'l'))
@@ -49,6 +51,7 @@ void	read_options(int ac, char **av, char *options)
 	struct_opt.opt_r = TRUE;
 	if (ft_strchr(options, 't'))
 	struct_opt.opt_t = TRUE;
+	save_data1(struct_info);
 	if (ac == 2)
 	{
 		printf("do the options on the current DIR\n");
@@ -58,7 +61,65 @@ void	read_options(int ac, char **av, char *options)
 		printf("do the options only on the remaining av[etc]\n");
 	}
 }
+void		save_data1(t_info *sinfo)
+{
+	int dir_counter;
+	//struct stat stats;
+	//struct passwd *person;
+	//struct group *grp;
+	struct dirent *read;
+	DIR *p;
+	//char *filename;
+	//int	l;
 
+	dir_counter = count_dir();
+	p = opendir("./");
+	if ((read = readdir(p)) != NULL)
+	{
+		set_types(&sinfo, read->d_name);
+		set_rights(&sinfo, read->d_name);
+	}
+		// l = strlen(read->d_name);
+		// filename = (char*)malloc(sizeof(char) * l + 1);
+		// strcpy(d_name, filename);
+}
+
+void		set_types(t_info **sinfo, char *filename)
+{
+	struct stat stats;
+
+	stat(filename, &stats);
+	if (S_ISBLK(stats.st_mode))
+		*sinfo.file_type = 3;
+	if (S_ISCHR(stats.st_mode))
+		*sinfo.file_type = 4;
+	if (S_ISDIR(stats.st_mode))
+		*sinfo.file_type = 2;
+	if (S_ISFIFO(stats.st_mode))
+		*sinfo.file_type = 5;
+	if (S_ISREG(stats.st_mode))
+		*sinfo.file_type = 1;
+	if (S_ISLNK(stats.st_mode))
+		*sinfo.file_type = 6;
+}
+
+void		set_rights(t_info **sinfo, char *filename)
+{
+	 
+}
+int		count_dir(void)
+{
+	DIR *p;
+	struct dirent *read;
+	int i;
+
+	i = 0;
+	p = opendir("./");
+	while ((read = readdir(p)) != NULL)
+		i++;
+	closedir(p);
+	return (i);
+}
 int		valid_options(char o, char *cmp_options)
 {
 	int i;

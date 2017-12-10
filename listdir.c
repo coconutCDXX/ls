@@ -10,7 +10,7 @@ int main(int ac, char **av)
 	DIR *p;
 	struct dirent *read;
 
-	p = opendir(av[1]);
+	p = opendir("./");
 	if (p == NULL)
 	{
 		printf("Error: %s\n", strerror(errno));
