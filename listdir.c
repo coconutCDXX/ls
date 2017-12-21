@@ -9,6 +9,7 @@ int main(int ac, char **av)
 {
 	DIR *p;
 	struct dirent *read;
+	int a;
 
 	p = opendir("./");
 	if (p == NULL)
@@ -20,5 +21,6 @@ int main(int ac, char **av)
 	{
 		printf("filename: %s\n", read->d_name);
 	}
+	ret("prout");
 	closedir(p);
 }

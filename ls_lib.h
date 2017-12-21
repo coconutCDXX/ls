@@ -35,6 +35,7 @@ typedef struct		s_info
 	char			*user_name;
 	char			*grp_name;
 	int			bytes;
+	int			time_sort;
 	char			*date;
 	char			*filename;
 	struct s_info	*next;

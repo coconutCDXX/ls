@@ -30,17 +30,17 @@ int		main(int ac, char **av)
 	{
 		//Basic LS - no options or extra files/dir
 		printf("read the current DIR and print basic ls\n");
+		read_options(ac, av, NULL);
 	}
 	return 0;
 }
 
-void	read_options(int ac, char **av, char *options)
+void		read_options(int ac, char **av, char *options)
 {
 	t_opt	struct_opt;
-	t_info	struct_info;
+	t_info	*sinfo;
 
-	//struct_info = (t_info)malloc(sizeof(struct_info));
-	//struct_opt = (t_opt)malloc(sizeof(struct_opt));
+	sinfo = (t_info*)malloc(sizeof(sinfo));
 	if (ft_strchr(options, 'a'))
 	struct_opt.opt_a = TRUE;
 	if (ft_strchr(options, 'l'))
@@ -51,26 +51,85 @@ void	read_options(int ac, char **av, char *options)
 	struct_opt.opt_r = TRUE;
 	if (ft_strchr(options, 't'))
 	struct_opt.opt_t = TRUE;
-	save_data1(&struct_info);
-	if (ac == 2)
+	save_data1(sinfo, "./");
+	print_opt(sinfo, struct_opt, av);
+}
+void		print_opt(t_info *sinfo, t_opt opt, char *av)
+{
+	if (opt.opt_t == TRUE)
+		sort_by_time_xor_rev(&sinfo, opt);
+	if (opt.opt_r == TRUE)
+		sort_by_r(&sinfo, opt);
+	// if R print all else just print
+	// if a or l print addition info
+}
+void		sort_by_r(t_info **sinfo, t_opt opt)
+{
+	t_info *newstart;
+	t_info *current;
+	t_info *saved_new;
+
+	current = *sinfo;
+	while (current->next != NULL)
 	{
-		printf("do the options on the current DIR\n");
+		while (current->next != NULL)
+			current = current->next;
+		if (saved_new == NULL)
+		{
+			saved_new = current;
+			newstart = current;
+		}
+		else
+		{
+			saved_new->next = current;
+			free(current->next);
+			current->next = NULL;
+			saved_new = saved_new->next;
+		}
+		current = *sinfo;
 	}
-	else
+	*sinfo = newstart;
+}
+
+void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
+{
+	t_info *current;
+	t_info *tmp;
+	t_info *start;
+
+	current = *sinfo;
+	start = *sinfo;
+	while (curent->next != NULL)
 	{
-		printf("do the options only on the remaining av[etc]\n");
+		if (current->time_sort < current->next->time_sort && opt->opt_r == FALSE)
+		{
+			tmp = curent->next;
+			current->next->next = current;
+			current = tmp;
+			free(tmp);
+			current = start;
+		}
+		else if (current->time_sort > current->next->time_sort && opt->opt_r == TRUE)
+		{
+			tmp = curent->next;
+			current->next->next = current;
+			current = tmp;
+			free(tmp);
+			current = start;
+		}
+		if (opt.opt_R == TRUE && current->tree != NULL)
+			sort_by_time_xor_rev(&(sinfo->tree, opt));
+		current = current->next;
 	}
 }
-void		save_data1(t_info *sinfo)
+void		*save_data1(t_info *sinfo, char *filename)
 {
-	int dir_counter;
-	struct stat stats;
-	struct dirent *read;
+	struct stat	stats;
+	struct dirent	*read;
 	DIR *p;
 
-	dir_counter = count_dir();
-	(*sinfo).dir_cont = dir_counter;
-	p = opendir("./");
+	sinfo->dir_cont = count_dir();
+	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
 		set_types_name(sinfo, read->d_name);
@@ -78,12 +137,30 @@ void		save_data1(t_info *sinfo)
 		set_uid_gid_size(sinfo, read->d_name);
 		set_time(sinfo, read->d_name);
 		stat(read->d_name, &stats);
-		if (S_ISDIR(stats.st_mode))
+		if (S_ISDIR(stats.st_mode) && ((!(strcmp(read->d_name, "."))) || (!(strcmp(read->d_name, "..")))))
 		{
-			(*sinfo)->tree = (s_info)malloc(sizeof(sinfo));
-			save_data2(sinfo, read->d_name);
+			sinfo->tree = (t_info*)malloc(sizeof(s_info));
+			save_data1(sinfo.tree, "./")
 		}
+		else
+			sinfo->tree = NULL;
+		sinfo->next = (t_info*)malloc(sizeof(s_info));
+		sinfo = sinfo->next;
 	}
+	sinfo->next = NULL;
+	closedir(p);
+}
+
+void		set_time(t_info *sinfo, char *filename)
+{
+	struct stat	stats;
+	int			l;
+
+	stat(filename, &stats);
+	l = strlen(ctime(&stats.st_atime));
+	sinfo->date = (char*)malloc(sizeof(char) * l + 1);
+	strcpy(sinfo->date, ctime(&stats.st_atime));
+	sinfo->time_sort = stats.st_atime;
 }
 
 void		set_types_name(t_info *sinfo, char *filename)
@@ -92,21 +169,21 @@ void		set_types_name(t_info *sinfo, char *filename)
 	int l;
 
 	l = strlen(filename);
-	(*sinfo)->filename = (char*)malloc(sizeof(char) * l + 1);
-	strcpy((*sinfo)->filename, filename);
+	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
+	strcpy(sinfo->filename, filename);
 	stat(filename, &stats);
 	if (S_ISBLK(stats.st_mode))
-		(*sinfo).file_type = 3;
+		sinfo->file_type = 3;
 	if (S_ISCHR(stats.st_mode))
-		(*sinfo).file_type = 4;
+		sinfo->file_type = 4;
 	if (S_ISDIR(stats.st_mode))
-		(*sinfo).file_type = 2;
+		sinfo->file_type = 2;
 	if (S_ISFIFO(stats.st_mode))
-		(*sinfo).file_type = 5;
+		sinfo->file_type = 5;
 	if (S_ISREG(stats.st_mode))
-		(*sinfo).file_type = 1;
+		sinfo->file_type = 1;
 	if (S_ISLNK(stats.st_mode))
-		(*sinfo).file_type = 6;
+		sinfo->file_type = 6;
 }
 
 void		set_rights(t_info *sinfo, char *filename)
@@ -114,21 +191,21 @@ void		set_rights(t_info *sinfo, char *filename)
 	struct stat stats;
 
 	stat(filename, &stats);
-	(*sinfo)->str_rights = (char*)malloc(sizeof(char) * 11 + 1);
-	switch((*sinfo).file_type)
+	sinfo->str_rights = (char*)malloc(sizeof(char) * 11 + 1);
+	switch(sinfo->file_type)
 	{
 		case 1 :
-		(*sinfo)->str_rights[0] = '-';
+		sinfo->str_rights[0] = '-';
 		case 2 :
-		(*sinfo)->str_rights[0] = 'D';
+		sinfo->str_rights[0] = 'D';
 		case 3 :
-		(*sinfo)->str_rights[0] = 'B';
+		sinfo->str_rights[0] = 'B';
 		case 4 :
-		(*sinfo)->str_rights[0] = 'C';
+		sinfo->str_rights[0] = 'C';
 		case 5 :
-		(*sinfo)->str_rights[0] = 'F';
+		sinfo->str_rights[0] = 'F';
 		case 6 :
-		(*sinfo)->str_rights[0] = 'L';
+		sinfo->str_rights[0] = 'L';
 	}
 	set_rightsbis(sinfo, stats);
 }
@@ -136,46 +213,46 @@ void		set_rights(t_info *sinfo, char *filename)
 void		set_rights_USR_GRP(t_info *sinfo, struct stats)
 {
 	if (stats.st_mode & S_IRUSR)
-		(*sinfo)->str_rights[1] = 'r';
+		sinfo->str_rights[1] = 'r';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IWUSR)
-		(*sinfo)->str_rights[1] = 'w';
+		sinfo->str_rights[1] = 'w';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IXUSR)
-		(*sinfo)->str_rights[1] = 'x';
+		sinfo->str_rights[1] = 'x';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IRGRP)
-		(*sinfo)->str_rights[1] = 'r';
+		sinfo->str_rights[1] = 'r';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IWGRP)
-		(*sinfo)->str_rights[1] = 'w';
+		sinfo->str_rights[1] = 'w';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IXGRP)
-		(*sinfo)->str_rights[1] = 'x';
+		sinfo->str_rights[1] = 'x';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	set_rightstris(sinfo, stats);
 }
 
 void		set_rights_OTH(t_info *sinfo, struct stats)
 {
 	if (stats.st_mode & S_IROTH)
-		(*sinfo)->str_rights[1] = 'r';
+		sinfo->str_rights[1] = 'r';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IWOTH)
-		(*sinfo)->str_rights[1] = 'w';
+		sinfo->str_rights[1] = 'w';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IXOTH)
-		(*sinfo)->str_rights[1] = 'x';
+		sinfo->str_rights[1] = 'x';
 	else
-		(*sinfo)->str_rights[1] = '-';
+		sinfo->str_rights[1] = '-';
 }
 
 void		set_uid_gid_size(t_info *sinfo, char *filename)
@@ -188,13 +265,13 @@ void		set_uid_gid_size(t_info *sinfo, char *filename)
 	stat(filename, &stats);
 	person = getpwuid(stats.st_uid);
 	l = strlen(person->pw_name);
-	(*sinfo)->user_name = (char*)malloc(sizeof(char) * l + 1);
-	strcpy((*sinfo)->user_name, person->pw_name);
+	sinfo->user_name = (char*)malloc(sizeof(char) * l + 1);
+	strcpy(sinfo->user_name, person->pw_name);
 	grp = getgrpid(stats.st_gid);
 	l = strlen(grp->gr_name);
-	(*sinfo)->grp_name = (char*)malloc(sizeof(char) * l + 1);
-	strcpy((*sinfo)->grp_name, grp->gr_name);
-	(*sinfo).bytes = stats.st_size;
+	sinfo->grp_name = (char*)malloc(sizeof(char) * l + 1);
+	strcpy(sinfo->grp_name, grp->gr_name);
+	sinfo->bytes = stats.st_size;
 }
 
 int		count_dir(void)
