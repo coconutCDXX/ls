@@ -7,7 +7,7 @@ int		main(int ac, char **av)
 
 	if (ac != 1)
 	{
-		if ((val_opt = verify_options(av[1], options)) == 1)
+		if ((val_opt = verify_options(av, options)) == 1)
 		{
 			//correct options and possible additional files/dir
 			// if 1 read the options and do them
@@ -52,17 +52,77 @@ void		read_options(int ac, char **av, char *options)
 	if (ft_strchr(options, 't'))
 	struct_opt.opt_t = TRUE;
 	save_data1(sinfo, "./");
-	print_opt(sinfo, struct_opt, av);
+	sort_command(sinfo, struct_opt, av);
 }
-void		print_opt(t_info *sinfo, t_opt opt, char *av)
+void		sort_command(t_info *sinfo, t_opt opt, char **av)
 {
+	int a;
+
+	a = 0;
 	if (opt.opt_t == TRUE)
+	{
 		sort_by_time_xor_rev(&sinfo, opt);
-	if (opt.opt_r == TRUE)
+		a = 1;
+	}
+	if (opt.opt_r == TRUE && a == 1)
 		sort_by_r(&sinfo, opt);
+	print_rec(&sinfo, opt, av);
 	// if R print all else just print
 	// if a or l print addition info
 }
+
+void		print_rec(t_info **sinfo, t_opt opt, char **av)
+{
+	t_info *tmp;
+
+	tmp = *sinfo
+	while (tmp != NULL)
+	{
+		if (opt.opt_a == TRUE && (tmp->filename[0] == '.'))
+		{
+			write_it_all(tmp, opt)
+			tmp = tmp->next;
+			continue;
+		}
+		if (!(tmp->filename[0] == '.')
+			write_it_all(tmp, opt);
+		tmp = tmp->next;
+	}
+	tmp = *sinfo;
+	while (tmp != NULL && opt.opt_R == TRUE)
+	{
+		if (tmp->tree != NULL)
+			print_rec(&(tmp->tree), opt, av);
+		tmp = tmp->next;
+	}
+}
+
+void		write_it_all(t_info *sinfo, t_opt opt)
+{
+	int l;
+
+	if (opt.opt_l == TRUE)
+	{
+			write(1, "total ", 6);
+			ft_putnbr(sinfo->dir_cont);
+			write(1, "\n", 1);
+			write(1, sinfo->str_rights, 10);
+			ft_putnbr(sinfo->file_type);
+			l = strlen(sinfo->user_name);
+			write(1, sinfo->user_name, l);
+			l = strlen(sinfo->grp_name);
+			write(1, sinfo->grp_name, l);
+			ft_putnbr(sinfo->bytes);
+			l = strlen(sinfo->date);
+			write(1, sinfo->date, l);
+			l = strlen(sinfo->filename);
+			write(1, sinfo->filename, l);
+			return;
+	}
+	l = strlen(sinfo->filename);
+	write(1, sinfo->filename, l);
+}
+
 void		sort_by_r(t_info **sinfo, t_opt opt)
 {
 	t_info *newstart;
@@ -72,22 +132,29 @@ void		sort_by_r(t_info **sinfo, t_opt opt)
 	current = *sinfo;
 	while (current->next != NULL)
 	{
-		while (current->next != NULL)
+		while (current->next->next != NULL)
 			current = current->next;
 		if (saved_new == NULL)
 		{
-			saved_new = current;
-			newstart = current;
+			saved_new = current->next;
+			newstart = current->next;
+			free(current->next);
+			current->next = NULL;
 		}
 		else
 		{
-			saved_new->next = current;
+			saved_new->next = current->next;
 			free(current->next);
 			current->next = NULL;
 			saved_new = saved_new->next;
 		}
+		if (opt.opt_R == TRUE && current->tree != NULL)
+			sort_by_r(&(sinfo->tree), opt);
 		current = *sinfo;
 	}
+	saved_new->next = current;
+	free(current);
+	saved_new->next->next = NULL;
 	*sinfo = newstart;
 }
 
@@ -118,7 +185,7 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 			current = start;
 		}
 		if (opt.opt_R == TRUE && current->tree != NULL)
-			sort_by_time_xor_rev(&(sinfo->tree, opt));
+			sort_by_time_xor_rev(&(sinfo->tree), opt);
 		current = current->next;
 	}
 }
@@ -137,10 +204,10 @@ void		*save_data1(t_info *sinfo, char *filename)
 		set_uid_gid_size(sinfo, read->d_name);
 		set_time(sinfo, read->d_name);
 		stat(read->d_name, &stats);
-		if (S_ISDIR(stats.st_mode) && ((!(strcmp(read->d_name, "."))) || (!(strcmp(read->d_name, "..")))))
+		if (S_ISDIR(stats.st_mode))
 		{
 			sinfo->tree = (t_info*)malloc(sizeof(s_info));
-			save_data1(sinfo.tree, "./")
+			save_data1(sinfo.tree, read->d_name);
 		}
 		else
 			sinfo->tree = NULL;
@@ -310,26 +377,35 @@ int		valid_options(char o, char *cmp_options)
 	return 0;
 }
 
-int		verify_options(char *opt, char *ret)
+int		verify_options(char **opt, char *ret)
 {
 	int i;
 	int j;
+	int a_v;
+	int k;
 
 	i = 0;
-	if (opt[0] != '-')
-		return 2;r--
-	opt++;
-	while (*opt != '\0')
+	a_v = 0;
+	k = 0;
+	while (*opt != NULL)
 	{
-		if ((j = valid_options(*opt, ret)) == 1)
+		if (opt[a_v][0] == '-')
 		{
-			ret[i] = *opt;
-			i++;
-			printf("av currently is: %c and ret is: %s\n", *opt, ret);
+			while (opt[a_v][k] != '\0')
+			{
+				if ((j = valid_options(opt[a_v][k], ret)) == 1)
+				{
+					ret[i] = opt[a_v][k];
+					i++;
+					//printf("av currently is: %c and ret is: %s\n", *opt, ret);
+				}
+				else if (j == 0)
+					return 0;
+				k++;
+			}
+			a_v++;
+			k = 0;
 		}
-		else if (j == 0)
-			return 0;
-		opt++;
 	}
 	printf("the options are: %s\n", ret);
 	return 1;
