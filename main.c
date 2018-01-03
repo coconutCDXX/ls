@@ -40,20 +40,25 @@ void		read_options(int ac, char **av, char *options)
 	t_opt	struct_opt;
 	t_info	*sinfo;
 
-	sinfo = (t_info*)malloc(sizeof(sinfo));
-	if (ft_strchr(options, 'a'))
-	struct_opt.opt_a = TRUE;
-	if (ft_strchr(options, 'l'))
-	struct_opt.opt_l = TRUE;
-	if (ft_strchr(options, 'R'))
-	struct_opt.opt_R = TRUE;
-	if (ft_strchr(options, 'r'))
-	struct_opt.opt_r = TRUE;
-	if (ft_strchr(options, 't'))
-	struct_opt.opt_t = TRUE;
+	sinfo = (t_info*)malloc(sizeof(t_info));
+	if (options != NULL)
+	{
+		if (strchr(options, 'a'))
+		struct_opt.opt_a = TRUE;
+		if (strchr(options, 'l'))
+		struct_opt.opt_l = TRUE;
+		if (strchr(options, 'R'))
+		struct_opt.opt_R = TRUE;
+		if (strchr(options, 'r'))
+		struct_opt.opt_r = TRUE;
+		if (strchr(options, 't'))
+		struct_opt.opt_t = TRUE;
+	}
 	save_data1(sinfo, "./");
+	printf("traveling printf yay\n");
 	sort_command(sinfo, struct_opt, av);
 }
+
 void		sort_command(t_info *sinfo, t_opt opt, char **av)
 {
 	int a;
@@ -75,16 +80,16 @@ void		print_rec(t_info **sinfo, t_opt opt, char **av)
 {
 	t_info *tmp;
 
-	tmp = *sinfo
+	tmp = *sinfo;
 	while (tmp != NULL)
 	{
 		if (opt.opt_a == TRUE && (tmp->filename[0] == '.'))
 		{
-			write_it_all(tmp, opt)
+			write_it_all(tmp, opt);
 			tmp = tmp->next;
 			continue;
 		}
-		if (!(tmp->filename[0] == '.')
+		if (!(tmp->filename[0] == '.'))
 			write_it_all(tmp, opt);
 		tmp = tmp->next;
 	}
@@ -149,7 +154,7 @@ void		sort_by_r(t_info **sinfo, t_opt opt)
 			saved_new = saved_new->next;
 		}
 		if (opt.opt_R == TRUE && current->tree != NULL)
-			sort_by_r(&(sinfo->tree), opt);
+			sort_by_r(&(current->tree), opt);
 		current = *sinfo;
 	}
 	saved_new->next = current;
@@ -166,53 +171,61 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 
 	current = *sinfo;
 	start = *sinfo;
-	while (curent->next != NULL)
+	while (current->next != NULL)
 	{
-		if (current->time_sort < current->next->time_sort && opt->opt_r == FALSE)
+		if (current->time_sort < current->next->time_sort && opt.opt_r == FALSE)
 		{
-			tmp = curent->next;
+			tmp = current->next;
 			current->next->next = current;
 			current = tmp;
 			free(tmp);
 			current = start;
 		}
-		else if (current->time_sort > current->next->time_sort && opt->opt_r == TRUE)
+		else if (current->time_sort > current->next->time_sort && opt.opt_r == TRUE)
 		{
-			tmp = curent->next;
+			tmp = current->next;
 			current->next->next = current;
 			current = tmp;
 			free(tmp);
 			current = start;
 		}
 		if (opt.opt_R == TRUE && current->tree != NULL)
-			sort_by_time_xor_rev(&(sinfo->tree), opt);
+			sort_by_time_xor_rev(&(current->tree), opt);
 		current = current->next;
 	}
 }
+
 void		*save_data1(t_info *sinfo, char *filename)
 {
 	struct stat	stats;
 	struct dirent	*read;
-	DIR *p;
+	DIR			*p;
 
 	sinfo->dir_cont = count_dir();
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
+		printf("traveling printf yay [%s] [%s]\n", filename, read->d_name);
 		set_types_name(sinfo, read->d_name);
 		set_rights(sinfo, read->d_name);
+
 		set_uid_gid_size(sinfo, read->d_name);
 		set_time(sinfo, read->d_name);
 		stat(read->d_name, &stats);
 		if (S_ISDIR(stats.st_mode))
 		{
-			sinfo->tree = (t_info*)malloc(sizeof(s_info));
-			save_data1(sinfo.tree, read->d_name);
+			printf("tree mode\n");
+			sinfo->tree = (t_info*)malloc(sizeof(t_info));
+			save_data1(sinfo->tree, read->d_name);
 		}
 		else
 			sinfo->tree = NULL;
-		sinfo->next = (t_info*)malloc(sizeof(s_info));
+		sinfo->next = (t_info*)malloc(sizeof(t_info));
+		printf("[%d]--[%s]\n", sinfo->dir_cont, sinfo->user_name);
 		sinfo = sinfo->next;
+		printf("[%d]--[%s]\n", sinfo->dir_cont, sinfo->user_name);
+
+
 	}
 	sinfo->next = NULL;
 	closedir(p);
@@ -258,7 +271,7 @@ void		set_rights(t_info *sinfo, char *filename)
 	struct stat stats;
 
 	stat(filename, &stats);
-	sinfo->str_rights = (char*)malloc(sizeof(char) * 11 + 1);
+	sinfo->str_rights = (char*)malloc(sizeof(char) * 11);
 	switch(sinfo->file_type)
 	{
 		case 1 :
@@ -274,52 +287,53 @@ void		set_rights(t_info *sinfo, char *filename)
 		case 6 :
 		sinfo->str_rights[0] = 'L';
 	}
-	set_rightsbis(sinfo, stats);
+	set_rights_USR_GRP(sinfo, stats);
 }
 
-void		set_rights_USR_GRP(t_info *sinfo, struct stats)
+void		set_rights_USR_GRP(t_info *sinfo, struct stat stats)
 {
 	if (stats.st_mode & S_IRUSR)
 		sinfo->str_rights[1] = 'r';
 	else
 		sinfo->str_rights[1] = '-';
 	if (stats.st_mode & S_IWUSR)
-		sinfo->str_rights[1] = 'w';
+		sinfo->str_rights[2] = 'w';
 	else
-		sinfo->str_rights[1] = '-';
+		sinfo->str_rights[2] = '-';
 	if (stats.st_mode & S_IXUSR)
-		sinfo->str_rights[1] = 'x';
+		sinfo->str_rights[3] = 'x';
 	else
-		sinfo->str_rights[1] = '-';
+		sinfo->str_rights[3] = '-';
 	if (stats.st_mode & S_IRGRP)
-		sinfo->str_rights[1] = 'r';
+		sinfo->str_rights[4] = 'r';
 	else
-		sinfo->str_rights[1] = '-';
+		sinfo->str_rights[4] = '-';
 	if (stats.st_mode & S_IWGRP)
-		sinfo->str_rights[1] = 'w';
+		sinfo->str_rights[5] = 'w';
 	else
-		sinfo->str_rights[1] = '-';
+		sinfo->str_rights[5] = '-';
 	if (stats.st_mode & S_IXGRP)
-		sinfo->str_rights[1] = 'x';
+		sinfo->str_rights[6] = 'x';
 	else
-		sinfo->str_rights[1] = '-';
-	set_rightstris(sinfo, stats);
+		sinfo->str_rights[6] = '-';
+	set_rights_OTH(sinfo, stats);
 }
 
-void		set_rights_OTH(t_info *sinfo, struct stats)
+void		set_rights_OTH(t_info *sinfo, struct stat stats)
 {
 	if (stats.st_mode & S_IROTH)
-		sinfo->str_rights[1] = 'r';
+		sinfo->str_rights[7] = 'r';
 	else
-		sinfo->str_rights[1] = '-';
+		sinfo->str_rights[7] = '-';
 	if (stats.st_mode & S_IWOTH)
-		sinfo->str_rights[1] = 'w';
+		sinfo->str_rights[8] = 'w';
 	else
-		sinfo->str_rights[1] = '-';
+		sinfo->str_rights[8] = '-';
 	if (stats.st_mode & S_IXOTH)
-		sinfo->str_rights[1] = 'x';
+		sinfo->str_rights[9] = 'x';
 	else
-		sinfo->str_rights[1] = '-';
+		sinfo->str_rights[9] = '-';
+	sinfo->str_rights[10] = '\0';
 }
 
 void		set_uid_gid_size(t_info *sinfo, char *filename)
@@ -334,7 +348,7 @@ void		set_uid_gid_size(t_info *sinfo, char *filename)
 	l = strlen(person->pw_name);
 	sinfo->user_name = (char*)malloc(sizeof(char) * l + 1);
 	strcpy(sinfo->user_name, person->pw_name);
-	grp = getgrpid(stats.st_gid);
+	grp = getgrgid(stats.st_gid);
 	l = strlen(grp->gr_name);
 	sinfo->grp_name = (char*)malloc(sizeof(char) * l + 1);
 	strcpy(sinfo->grp_name, grp->gr_name);
@@ -354,6 +368,7 @@ int		count_dir(void)
 	closedir(p);
 	return (i);
 }
+
 int		valid_options(char o, char *cmp_options)
 {
 	int i;
@@ -409,4 +424,25 @@ int		verify_options(char **opt, char *ret)
 	}
 	printf("the options are: %s\n", ret);
 	return 1;
+}
+
+void		ft_putnbr(int n)
+{
+	if (n == -2147483648)
+	{
+		//putstr("-2147483648");
+		return ;
+	}
+	if (n < 0)
+	{
+		putchar('-');
+		n = n * (-1);
+	}
+	if (n >= 10)
+	{
+		ft_putnbr(n / 10);
+		ft_putnbr(n % 10);
+	}
+	else
+		putchar(n + 48);
 }

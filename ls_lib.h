@@ -14,17 +14,15 @@
 # include <errno.h>
 # include <dirent.h>
 
-int					verify_options(char *opt, char *ret);
-int					valid_options(char o, char *cmp_options);
-void				read_options(int ac, char **av, char *options);
+typedef enum		bools{FALSE = 0, TRUE = 1} boolean;
 
 typedef struct		s_opt
 {
-	bool			opt_a;
-	bool			opt_l;
-	bool			opt_R;
-	bool			opt_r;
-	bool			opt_t;
+	boolean		opt_a;
+	boolean		opt_l;
+	boolean		opt_R;
+	boolean		opt_r;
+	boolean		opt_t;
 }				t_opt;
 
 typedef struct		s_info
@@ -41,5 +39,23 @@ typedef struct		s_info
 	struct s_info	*next;
 	struct s_info	*tree;
 }				t_info;
+
+int				verify_options(char **opt, char *ret);
+int				valid_options(char o, char *cmp_options);
+void				read_options(int ac, char **av, char *options);
+void				sort_command(t_info *sinfo, t_opt opt, char **av);
+void				print_rec(t_info **sinfo, t_opt opt, char **av);
+void				write_it_all(t_info *sinfo, t_opt opt);
+void				sort_by_r(t_info **sinfo, t_opt opt);
+void				sort_by_time_xor_rev(t_info **sinfo, t_opt opt);
+void				*save_data1(t_info *sinfo, char *filename);
+void				set_time(t_info *sinfo, char *filename);
+void				set_types_name(t_info *sinfo, char *filename);
+void				set_rights(t_info *sinfo, char *filename);
+void				set_rights_USR_GRP(t_info *sinfo, struct stat);
+void				set_rights_OTH(t_info *sinfo, struct stat);
+void				set_uid_gid_size(t_info *sinfo, char *filename);
+int				count_dir(void);
+void				ft_putnbr(int n);
 
 #endif

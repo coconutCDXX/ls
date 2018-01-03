@@ -21,6 +21,6 @@ int main(int ac, char **av)
 	{
 		printf("filename: %s\n", read->d_name);
 	}
-	ret("prout");
+	//ret("prout");
 	closedir(p);
 }
