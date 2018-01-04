@@ -55,7 +55,7 @@ void		read_options(int ac, char **av, char *options)
 		struct_opt.opt_t = TRUE;
 	}
 	save_data1(sinfo, "./");
-	printf("traveling printf yay\n");
+	printf("save data is done check for sinfo [%s]\n", sinfo->filename);
 	sort_command(sinfo, struct_opt, av);
 }
 
@@ -71,6 +71,7 @@ void		sort_command(t_info *sinfo, t_opt opt, char **av)
 	}
 	if (opt.opt_r == TRUE && a == 1)
 		sort_by_r(&sinfo, opt);
+	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 	print_rec(&sinfo, opt, av);
 	// if R print all else just print
 	// if a or l print addition info
@@ -81,8 +82,10 @@ void		print_rec(t_info **sinfo, t_opt opt, char **av)
 	t_info *tmp;
 
 	tmp = *sinfo;
+	printf("is tmp alive? [%s]\n", tmp->filename);
 	while (tmp != NULL)
 	{
+		printf("post savedata1 [%s]\n\n ", tmp->filename);
 		if (opt.opt_a == TRUE && (tmp->filename[0] == '.'))
 		{
 			write_it_all(tmp, opt);
@@ -90,7 +93,10 @@ void		print_rec(t_info **sinfo, t_opt opt, char **av)
 			continue;
 		}
 		if (!(tmp->filename[0] == '.'))
+		{
 			write_it_all(tmp, opt);
+			printf("post savedata1abcdef\n\n");
+		}
 		tmp = tmp->next;
 	}
 	tmp = *sinfo;
@@ -108,6 +114,7 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 
 	if (opt.opt_l == TRUE)
 	{
+			printf("post savedata1\n\n");
 			write(1, "total ", 6);
 			ft_putnbr(sinfo->dir_cont);
 			write(1, "\n", 1);
@@ -195,40 +202,45 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 	}
 }
 
-void		*save_data1(t_info *sinfo, char *filename)
+void		save_data1(t_info *sinfo, char *filename)
 {
-	struct stat	stats;
+	struct stat		stats;
 	struct dirent	*read;
-	DIR			*p;
+	DIR				*p;
+	//t_info			*start;
+	//t_info			*tmp;
 
+//start = *sinfo;
+	//tmp = *sinfo;
 	sinfo->dir_cont = count_dir();
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
-		printf("traveling printf yay [%s] [%s]\n", filename, read->d_name);
 		set_types_name(sinfo, read->d_name);
-		set_rights(sinfo, read->d_name);
-
-		set_uid_gid_size(sinfo, read->d_name);
-		set_time(sinfo, read->d_name);
-		stat(read->d_name, &stats);
-		if (S_ISDIR(stats.st_mode))
-		{
-			printf("tree mode\n");
-			sinfo->tree = (t_info*)malloc(sizeof(t_info));
-			save_data1(sinfo->tree, read->d_name);
-		}
-		else
-			sinfo->tree = NULL;
+		printf("traveling printf yay [%s] [%s] [%s] \n", filename, read->d_name, sinfo->filename);
+		// set_rights(sinfo, read->d_name);
+		//
+		// set_uid_gid_size(sinfo, read->d_name);
+		// set_time(sinfo, read->d_name);
+		// stat(read->d_name, &stats);
+		// if (S_ISDIR(stats.st_mode))
+		// {
+		// 	printf("tree mode\n");
+		// 	sinfo->tree = (t_info*)malloc(sizeof(t_info));
+		// 	save_data1(sinfo->tree, read->d_name);
+		// }
+		// else
+		// 	sinfo->tree = NULL;
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
-		printf("[%d]--[%s]\n", sinfo->dir_cont, sinfo->user_name);
+		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
 		sinfo = sinfo->next;
-		printf("[%d]--[%s]\n", sinfo->dir_cont, sinfo->user_name);
+		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
 
 
 	}
 	sinfo->next = NULL;
 	closedir(p);
+	//*sinfo = start;
 }
 
 void		set_time(t_info *sinfo, char *filename)

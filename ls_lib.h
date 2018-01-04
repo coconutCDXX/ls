@@ -48,7 +48,7 @@ void				print_rec(t_info **sinfo, t_opt opt, char **av);
 void				write_it_all(t_info *sinfo, t_opt opt);
 void				sort_by_r(t_info **sinfo, t_opt opt);
 void				sort_by_time_xor_rev(t_info **sinfo, t_opt opt);
-void				*save_data1(t_info *sinfo, char *filename);
+void				save_data1(t_info *sinfo, char *filename);
 void				set_time(t_info *sinfo, char *filename);
 void				set_types_name(t_info *sinfo, char *filename);
 void				set_rights(t_info *sinfo, char *filename);
