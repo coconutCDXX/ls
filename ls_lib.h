@@ -14,7 +14,7 @@
 # include <errno.h>
 # include <dirent.h>
 
-typedef enum		bools{FALSE = 0, TRUE = 1} boolean;
+typedef enum		bools{FALSE, TRUE} boolean;
 
 typedef struct		s_opt
 {
@@ -33,14 +33,14 @@ typedef struct		s_info
 	char			*user_name;
 	char			*grp_name;
 	int			bytes;
-	int			time_sort;
+	time_t		time_sort;
 	char			*date;
 	char			*filename;
 	struct s_info	*next;
 	struct s_info	*tree;
 }				t_info;
 
-int				verify_options(char **opt, char *ret);
+int				verify_options(char **av, char *ret);
 int				valid_options(char o, char *cmp_options);
 void				read_options(int ac, char **av, char *options);
 void				sort_command(t_info *sinfo, t_opt opt, char **av);
@@ -57,5 +57,7 @@ void				set_rights_OTH(t_info *sinfo, struct stat);
 void				set_uid_gid_size(t_info *sinfo, char *filename);
 int				count_dir(void);
 void				ft_putnbr(int n);
+void				ft_putchar(char c);
+t_opt			set_options_zero(struct s_opt);
 
 #endif

@@ -35,25 +35,41 @@ int		main(int ac, char **av)
 	return 0;
 }
 
+t_opt	set_options_zero(t_opt struct_opt)
+{
+	struct_opt.opt_a = FALSE;
+
+	struct_opt.opt_l = FALSE;
+
+	struct_opt.opt_R = FALSE;
+
+	struct_opt.opt_r = FALSE;
+
+	struct_opt.opt_t = FALSE;
+	return (struct_opt);
+}
+
 void		read_options(int ac, char **av, char *options)
 {
 	t_opt	struct_opt;
 	t_info	*sinfo;
 
 	sinfo = (t_info*)malloc(sizeof(t_info));
+	struct_opt = set_options_zero(struct_opt);
 	if (options != NULL)
 	{
 		if (strchr(options, 'a'))
-		struct_opt.opt_a = TRUE;
+			struct_opt.opt_a = TRUE;
 		if (strchr(options, 'l'))
-		struct_opt.opt_l = TRUE;
+			struct_opt.opt_l = TRUE;
 		if (strchr(options, 'R'))
-		struct_opt.opt_R = TRUE;
+			struct_opt.opt_R = TRUE;
 		if (strchr(options, 'r'))
-		struct_opt.opt_r = TRUE;
+			struct_opt.opt_r = TRUE;
 		if (strchr(options, 't'))
-		struct_opt.opt_t = TRUE;
+			struct_opt.opt_t = TRUE;
 	}
+	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", struct_opt.opt_a, struct_opt.opt_l, struct_opt.opt_R, struct_opt.opt_r, struct_opt.opt_t);
 	save_data1(sinfo, "./");
 	printf("save data is done check for sinfo [%s]\n", sinfo->filename);
 	sort_command(sinfo, struct_opt, av);
@@ -68,11 +84,14 @@ void		sort_command(t_info *sinfo, t_opt opt, char **av)
 	{
 		sort_by_time_xor_rev(&sinfo, opt);
 		a = 1;
+		printf("i sorted by t\n");
 	}
-	if (opt.opt_r == TRUE && a == 1)
+	else if (opt.opt_r == TRUE && a == 0)
 		sort_by_r(&sinfo, opt);
+	// else
+	// 	sort_by_alpha(&sinfo);
 	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
-	print_rec(&sinfo, opt, av);
+	//print_rec(&sinfo, opt, av);
 	// if R print all else just print
 	// if a or l print addition info
 }
@@ -83,9 +102,9 @@ void		print_rec(t_info **sinfo, t_opt opt, char **av)
 
 	tmp = *sinfo;
 	printf("is tmp alive? [%s]\n", tmp->filename);
-	while (tmp != NULL)
+	while (tmp->next != NULL)
 	{
-		printf("post savedata1 [%s]\n\n ", tmp->filename);
+		printf("printing -> [%s][%d]\n", tmp->filename, (int)strlen(tmp->filename));
 		if (opt.opt_a == TRUE && (tmp->filename[0] == '.'))
 		{
 			write_it_all(tmp, opt);
@@ -95,12 +114,13 @@ void		print_rec(t_info **sinfo, t_opt opt, char **av)
 		if (!(tmp->filename[0] == '.'))
 		{
 			write_it_all(tmp, opt);
-			printf("post savedata1abcdef\n\n");
 		}
 		tmp = tmp->next;
+		printf("[%p]\n\n", tmp);
 	}
+	printf("exit loop\n");
 	tmp = *sinfo;
-	while (tmp != NULL && opt.opt_R == TRUE)
+	while (tmp->next != NULL && opt.opt_R == TRUE)
 	{
 		if (tmp->tree != NULL)
 			print_rec(&(tmp->tree), opt, av);
@@ -114,25 +134,32 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 
 	if (opt.opt_l == TRUE)
 	{
-			printf("post savedata1\n\n");
-			write(1, "total ", 6);
-			ft_putnbr(sinfo->dir_cont);
-			write(1, "\n", 1);
+			//write(1, "total ", 6);
+			// ft_putnbr(sinfo->dir_cont);
+			// write(1, "\n", 1);
 			write(1, sinfo->str_rights, 10);
+			ft_putchar(' ');
 			ft_putnbr(sinfo->file_type);
+			ft_putchar(' ');
 			l = strlen(sinfo->user_name);
 			write(1, sinfo->user_name, l);
+			ft_putchar(' ');
 			l = strlen(sinfo->grp_name);
 			write(1, sinfo->grp_name, l);
+			ft_putchar('\t');
 			ft_putnbr(sinfo->bytes);
+			ft_putchar(' ');
 			l = strlen(sinfo->date);
 			write(1, sinfo->date, l);
-			l = strlen(sinfo->filename);
-			write(1, sinfo->filename, l);
-			return;
+			ft_putchar(' ');
+			// l = strlen(sinfo->filename);
+			// write(1, sinfo->filename, l);
+			// return;
 	}
 	l = strlen(sinfo->filename);
 	write(1, sinfo->filename, l);
+	//printf("\nwhats sinfo? [%s]", sinfo->filename);
+	printf("--end write [%d]\n", l);
 }
 
 void		sort_by_r(t_info **sinfo, t_opt opt)
@@ -176,30 +203,52 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 	t_info *tmp;
 	t_info *start;
 
-	current = *sinfo;
 	start = *sinfo;
-	while (current->next != NULL)
+	current = *sinfo;
+	while (current->next && current->next->next)
 	{
-		if (current->time_sort < current->next->time_sort && opt.opt_r == FALSE)
+		printf("where are we [%s] [%lld]\n", current->filename, (long long)current->time_sort);
+		//printf("next one [%s] [%lld]\n\n", current->next->filename, (long long)current->next->time_sort);
+		if ((current->time_sort < current->next->time_sort) && opt.opt_r != TRUE)
 		{
 			tmp = current->next;
-			current->next->next = current;
-			current = tmp;
-			free(tmp);
-			current = start;
+			current->next = tmp->next;
+			tmp->next = current;
+			if (*sinfo == current)
+			{
+				*sinfo = tmp;
+				current = *sinfo;
+				printf("new start![%s]\n", current->filename);
+			}
+			else
+			{
+				start->next = tmp;
+				current = *sinfo;
+				printf("in the sort part a [%s] [%lld]\n", start->filename, (long long)current->time_sort);
+				printf("in the sort part b [%s] [%lld]\n\n", start->next->filename, (long long)current->next->time_sort);
+			}
 		}
-		else if (current->time_sort > current->next->time_sort && opt.opt_r == TRUE)
+		else
 		{
-			tmp = current->next;
-			current->next->next = current;
-			current = tmp;
-			free(tmp);
-			current = start;
+			start = current;
+			current = current->next;
+			printf("aliv?\n");
 		}
-		if (opt.opt_R == TRUE && current->tree != NULL)
-			sort_by_time_xor_rev(&(current->tree), opt);
-		current = current->next;
+		// else if (current->time_sort > current->next->time_sort && opt.opt_r == TRUE)
+		// {
+		// 	printf("this is happening?\n");
+		// 	tmp = current->next;
+		// 	current->next->next = current;
+		// 	current = tmp;
+		// 	free(tmp);
+		// 	current = *sinfo;
+		// 	continue;
+		// }
+		// if (opt.opt_R == TRUE && current->tree != NULL)
+		// 	sort_by_time_xor_rev(&(current->tree), opt);
 	}
+	//*sinfo = start;
+	printf("whats the new start [%s]\n", start->filename);
 }
 
 void		save_data1(t_info *sinfo, char *filename)
@@ -210,27 +259,27 @@ void		save_data1(t_info *sinfo, char *filename)
 	//t_info			*start;
 	//t_info			*tmp;
 
-//start = *sinfo;
+	//start = *sinfo;
 	//tmp = *sinfo;
 	sinfo->dir_cont = count_dir();
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
 		set_types_name(sinfo, read->d_name);
-		printf("traveling printf yay [%s] [%s] [%s] \n", filename, read->d_name, sinfo->filename);
-		// set_rights(sinfo, read->d_name);
-		//
-		// set_uid_gid_size(sinfo, read->d_name);
-		// set_time(sinfo, read->d_name);
-		// stat(read->d_name, &stats);
-		// if (S_ISDIR(stats.st_mode))
-		// {
-		// 	printf("tree mode\n");
-		// 	sinfo->tree = (t_info*)malloc(sizeof(t_info));
-		// 	save_data1(sinfo->tree, read->d_name);
-		// }
-		// else
-		// 	sinfo->tree = NULL;
+		set_rights(sinfo, read->d_name);
+		printf("traveling printf yay [%s] [%s] [%s] {%s} \n", filename, read->d_name, sinfo->filename, sinfo->str_rights);
+		set_uid_gid_size(sinfo, read->d_name);
+		printf("what i crash on?\n");
+		set_time(sinfo, read->d_name);
+		//stat(read->d_name, &stats);
+		if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)  && read->d_name[0] != '.' */)
+		{
+			printf("tree mode\n");
+			sinfo->tree = (t_info*)malloc(sizeof(t_info));
+			save_data1(sinfo->tree, read->d_name);
+		}
+		else
+			sinfo->tree = NULL;
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
 		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
 		sinfo = sinfo->next;
@@ -249,10 +298,10 @@ void		set_time(t_info *sinfo, char *filename)
 	int			l;
 
 	stat(filename, &stats);
-	l = strlen(ctime(&stats.st_atime));
+	l = strlen(ctime(&stats.st_mtime));
 	sinfo->date = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->date, ctime(&stats.st_atime));
-	sinfo->time_sort = stats.st_atime;
+	strcpy(sinfo->date, ctime(&stats.st_mtime));
+	sinfo->time_sort = stats.st_mtime;
 }
 
 void		set_types_name(t_info *sinfo, char *filename)
@@ -276,6 +325,7 @@ void		set_types_name(t_info *sinfo, char *filename)
 		sinfo->file_type = 1;
 	if (S_ISLNK(stats.st_mode))
 		sinfo->file_type = 6;
+	printf("sinfo->file_type [%d]\n", sinfo->file_type);
 }
 
 void		set_rights(t_info *sinfo, char *filename)
@@ -284,21 +334,18 @@ void		set_rights(t_info *sinfo, char *filename)
 
 	stat(filename, &stats);
 	sinfo->str_rights = (char*)malloc(sizeof(char) * 11);
-	switch(sinfo->file_type)
-	{
-		case 1 :
+	if (sinfo->file_type == 1)
 		sinfo->str_rights[0] = '-';
-		case 2 :
-		sinfo->str_rights[0] = 'D';
-		case 3 :
-		sinfo->str_rights[0] = 'B';
-		case 4 :
-		sinfo->str_rights[0] = 'C';
-		case 5 :
-		sinfo->str_rights[0] = 'F';
-		case 6 :
-		sinfo->str_rights[0] = 'L';
-	}
+	if (sinfo->file_type == 2)
+		sinfo->str_rights[0] = 'd';
+	if (sinfo->file_type == 3)
+		sinfo->str_rights[0] = 'b';
+	if (sinfo->file_type == 4)
+		sinfo->str_rights[0] = 'c';
+	if (sinfo->file_type == 5)
+		sinfo->str_rights[0] = 'f';
+	if (sinfo->file_type == 6)
+		sinfo->str_rights[0] = 'l';
 	set_rights_USR_GRP(sinfo, stats);
 }
 
@@ -404,7 +451,7 @@ int		valid_options(char o, char *cmp_options)
 	return 0;
 }
 
-int		verify_options(char **opt, char *ret)
+int		verify_options(char **av, char *ret)
 {
 	int i;
 	int j;
@@ -412,28 +459,29 @@ int		verify_options(char **opt, char *ret)
 	int k;
 
 	i = 0;
-	a_v = 0;
-	k = 0;
-	while (*opt != NULL)
+	a_v = 1;
+	k = 1;
+	while (av[a_v])
 	{
-		if (opt[a_v][0] == '-')
+		if (av[a_v][0] == '-')
 		{
-			while (opt[a_v][k] != '\0')
+			while (av[a_v][k] != '\0')
 			{
-				if ((j = valid_options(opt[a_v][k], ret)) == 1)
+				if ((j = valid_options(av[a_v][k], ret)) == 1)
 				{
-					ret[i] = opt[a_v][k];
+					ret[i] = av[a_v][k];
 					i++;
-					//printf("av currently is: %c and ret is: %s\n", *opt, ret);
+					//printf("av currently is: %c and ret is: %s\n", *av, ret);
 				}
 				else if (j == 0)
 					return 0;
 				k++;
 			}
-			a_v++;
-			k = 0;
+			k = 1;
 		}
+		a_v++;
 	}
+	ret[i] = '\0';
 	printf("the options are: %s\n", ret);
 	return 1;
 }
@@ -447,7 +495,7 @@ void		ft_putnbr(int n)
 	}
 	if (n < 0)
 	{
-		putchar('-');
+		ft_putchar('-');
 		n = n * (-1);
 	}
 	if (n >= 10)
@@ -456,5 +504,10 @@ void		ft_putnbr(int n)
 		ft_putnbr(n % 10);
 	}
 	else
-		putchar(n + 48);
+		ft_putchar(n + 48);
+}
+
+void		ft_putchar(char c)
+{
+	write(1, &c, 1);
 }
