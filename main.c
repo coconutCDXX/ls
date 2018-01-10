@@ -256,6 +256,7 @@ void		save_data1(t_info *sinfo, char *filename)
 	struct stat		stats;
 	struct dirent	*read;
 	DIR				*p;
+	char			*treename;
 	//t_info			*start;
 	//t_info			*tmp;
 
@@ -263,8 +264,10 @@ void		save_data1(t_info *sinfo, char *filename)
 	//tmp = *sinfo;
 	sinfo->dir_cont = count_dir();
 	p = opendir(filename);
+
 	while ((read = readdir(p)) != NULL)
 	{
+		//create_filename(read->d_name, filename);
 		set_types_name(sinfo, read->d_name);
 		set_rights(sinfo, read->d_name);
 		printf("traveling printf yay [%s] [%s] [%s] {%s} \n", filename, read->d_name, sinfo->filename, sinfo->str_rights);
@@ -272,11 +275,13 @@ void		save_data1(t_info *sinfo, char *filename)
 		printf("what i crash on?\n");
 		set_time(sinfo, read->d_name);
 		//stat(read->d_name, &stats);
-		if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)  && read->d_name[0] != '.' */)
+		if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && read->d_name[0] != '.')
 		{
 			printf("tree mode\n");
 			sinfo->tree = (t_info*)malloc(sizeof(t_info));
-			save_data1(sinfo->tree, read->d_name);
+			treename = create_filename(read->d_name, filename);
+			printf("tree[%s]\n", treename);
+			save_data2(sinfo->tree, treename);
 		}
 		else
 			sinfo->tree = NULL;
@@ -289,9 +294,74 @@ void		save_data1(t_info *sinfo, char *filename)
 	}
 	sinfo->next = NULL;
 	closedir(p);
-	//*sinfo = start;
 }
 
+char	*create_filename(char *read, char *filename)
+{
+	char *ret;
+
+	if (!(strcmp(filename, "./")))
+	{
+		ret = (char*)malloc(sizeof(char) * strlen(read) + 1);
+		//ret[0] = '/';
+		//ret[1] = '/';
+		strcat(ret, read);
+		return ret;
+	}
+	ret = (char*)malloc(sizeof(char) * strlen(read) + strlen(filename) + 2);
+	strcpy(ret, filename);
+	strcat(ret, "/");
+	strcat(ret, read);
+	//strcat(ret, "/");
+	return ret;
+}
+
+void		save_data2(t_info *sinfo, char *filename)
+{
+	struct stat		stats;
+	struct dirent	*read;
+	DIR				*p;
+	//t_info			*start;
+	//t_info			*tmp;
+
+	//start = *sinfo;
+	//tmp = *sinfo;
+	sinfo->dir_cont = count_dir();
+	p = opendir(filename);
+	printf("old filename is [%s]\n", filename);
+	while ((read = readdir(p)) != NULL)
+	{
+		filename = create_filename(read->d_name, filename);
+		printf("new filename is [%s]\n", filename);
+		set_types_name(sinfo, filename);
+		set_rights(sinfo, filename);
+		printf("traveling printf yay [%s] [%s] [%s] {%s} \n", filename, read->d_name, sinfo->filename, sinfo->str_rights);
+		set_uid_gid_size(sinfo, filename);
+		printf("what i crash on?\n");
+		set_time(sinfo, filename);
+		//stat(read->d_name, &stats);
+		if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)  && filename[0] != '.' */)
+		{
+			printf("tree mode\n");
+			sinfo->tree = (t_info*)malloc(sizeof(t_info));
+			//treename = (char*)malloc(sizeof(char) * strlen(read->d_name) + 2);
+			// strcpy(treename, read->d_name);
+			// strcat(treename, "/");
+			// printf("what is treename [%s]", treename);
+			save_data2(sinfo->tree, filename);
+		}
+		else
+			sinfo->tree = NULL;
+		sinfo->next = (t_info*)malloc(sizeof(t_info));
+		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
+		sinfo = sinfo->next;
+		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
+
+
+	}
+	sinfo->next = NULL;
+	closedir(p);
+}
 void		set_time(t_info *sinfo, char *filename)
 {
 	struct stat	stats;
@@ -308,11 +378,12 @@ void		set_types_name(t_info *sinfo, char *filename)
 {
 	struct stat stats;
 	int l;
+	int k;
 
 	l = strlen(filename);
 	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
 	strcpy(sinfo->filename, filename);
-	stat(filename, &stats);
+	k = stat(filename, &stats);
 	if (S_ISBLK(stats.st_mode))
 		sinfo->file_type = 3;
 	if (S_ISCHR(stats.st_mode))
@@ -325,7 +396,9 @@ void		set_types_name(t_info *sinfo, char *filename)
 		sinfo->file_type = 1;
 	if (S_ISLNK(stats.st_mode))
 		sinfo->file_type = 6;
-	printf("sinfo->file_type [%d]\n", sinfo->file_type);
+	printf("sinfo->file_type [%d] [%d]\n", sinfo->file_type, k);
+	if (k == -1)
+		perror("Error: ");
 }
 
 void		set_rights(t_info *sinfo, char *filename)

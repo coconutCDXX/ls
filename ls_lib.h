@@ -49,15 +49,17 @@ void				write_it_all(t_info *sinfo, t_opt opt);
 void				sort_by_r(t_info **sinfo, t_opt opt);
 void				sort_by_time_xor_rev(t_info **sinfo, t_opt opt);
 void				save_data1(t_info *sinfo, char *filename);
+void				save_data2(t_info *sinfo, char *filename);
 void				set_time(t_info *sinfo, char *filename);
 void				set_types_name(t_info *sinfo, char *filename);
 void				set_rights(t_info *sinfo, char *filename);
 void				set_rights_USR_GRP(t_info *sinfo, struct stat);
 void				set_rights_OTH(t_info *sinfo, struct stat);
 void				set_uid_gid_size(t_info *sinfo, char *filename);
-int				count_dir(void);
+int					count_dir(void);
 void				ft_putnbr(int n);
 void				ft_putchar(char c);
+char				*create_filename(char *read, char *filename);
 t_opt			set_options_zero(struct s_opt);
 
 #endif
