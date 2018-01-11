@@ -71,30 +71,10 @@ void		read_options(int ac, char **av, char *options)
 	}
 	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", struct_opt.opt_a, struct_opt.opt_l, struct_opt.opt_R, struct_opt.opt_r, struct_opt.opt_t);
 	save_data1(sinfo, "./");
-	printf("save data is done check for sinfo [%s]\n", sinfo->filename);
+	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
 	sort_command(sinfo, struct_opt, av);
 }
 
-void		sort_command(t_info *sinfo, t_opt opt, char **av)
-{
-	int a;
-
-	a = 0;
-	if (opt.opt_t == TRUE)
-	{
-		sort_by_time_xor_rev(&sinfo, opt);
-		a = 1;
-		printf("i sorted by t\n");
-	}
-	else if (opt.opt_r == TRUE && a == 0)
-		sort_by_r(&sinfo, opt);
-	// else
-	// 	sort_by_alpha(&sinfo);
-	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
-	//print_rec(&sinfo, opt, av);
-	// if R print all else just print
-	// if a or l print addition info
-}
 
 void		print_rec(t_info **sinfo, t_opt opt, char **av)
 {
@@ -162,6 +142,26 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 	printf("--end write [%d]\n", l);
 }
 
+void		sort_command(t_info *sinfo, t_opt opt, char **av)
+{
+	int a;
+
+	a = 0;
+	//sort_by_alpha(&sinfo);
+	if (opt.opt_t == TRUE)
+	{
+		sort_by_time_xor_rev(&sinfo, opt);
+		a = 1;
+		printf("i sorted by t\n");
+	}
+	else if (opt.opt_r == TRUE && a == 0)
+		sort_by_r(&sinfo, opt);
+	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
+	print_rec(&sinfo, opt, av);
+	// if R print all else just print
+	// if a or l print addition info
+}
+
 void		sort_by_r(t_info **sinfo, t_opt opt)
 {
 	t_info *newstart;
@@ -173,30 +173,96 @@ void		sort_by_r(t_info **sinfo, t_opt opt)
 	{
 		while (current->next->next != NULL)
 			current = current->next;
-		if (saved_new == NULL)
+		printf("current is [%s]\n", current->filename);
+		if (!(saved_new->next))
 		{
+			printf("new start [%s]\n", saved_new->filename);
 			saved_new = current->next;
 			newstart = current->next;
-			free(current->next);
+			newstart->next = saved_new;
+			//free(current->next);
 			current->next = NULL;
 		}
 		else
 		{
-			saved_new->next = current->next;
-			free(current->next);
+			saved_new = current->next;
+			//free(current->next);
 			current->next = NULL;
 			saved_new = saved_new->next;
+			printf("saved_new->next [%s]\n", saved_new->next->filename);
 		}
 		if (opt.opt_R == TRUE && current->tree != NULL)
 			sort_by_r(&(current->tree), opt);
 		current = *sinfo;
 	}
 	saved_new->next = current;
-	free(current);
+	//free(current);
 	saved_new->next->next = NULL;
 	*sinfo = newstart;
 }
+void			sort_by_alpha(t_info **sinfo)
+{
+	t_info *current;
+	t_info *tmp;
+	t_info *start;
 
+	start = *sinfo;
+	current = *sinfo;
+	while (current->next && current->next->next)
+	{
+		if (check_alpha(current->filename, current->next->filename))
+		{
+			tmp = current->next;
+			current->next = tmp->next;
+			tmp->next = current;
+			if (*sinfo == current)
+			{
+				*sinfo = tmp;
+				current = *sinfo;
+			}
+			else
+			{
+				start->next = tmp;
+				current = *sinfo;
+			}
+		}
+		else
+		{
+			start = current;
+			current = current->next;
+		}
+	}
+}
+
+int		check_alpha(char *a, char *b)
+{
+	int i;
+	int j;
+
+	j = 0;
+	i = 0;
+	if(!(strcmp(b, "..")) && !(strcmp(a, ".")))
+		return 0;
+	if (a[j] == '.')
+		j++;
+	if (b[i] == '.')
+		i++;
+	if (a[j] >= 65 && a[j] <= 90 && !(b[i] >= 65 && b[i] <= 90))
+		if (a[j] + 32 > b[i])
+			return (1);
+		else
+			return (0);
+	if (b[i] >= 65 && b[i] <= 90 && !(a[j] >= 65 && a[j] <= 90))
+		if (b[i] + 32 < a[j])
+			return (1);
+		else
+			return (0);
+	if (a[j] > b[i])
+		return (1);
+	if (a[j] == b[i])
+		return (check_alpha(a + 1, b + 1));
+	return (0);
+}
 void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 {
 	t_info *current;
@@ -267,24 +333,24 @@ void		save_data1(t_info *sinfo, char *filename)
 
 	while ((read = readdir(p)) != NULL)
 	{
-		//create_filename(read->d_name, filename);
-		set_types_name(sinfo, read->d_name);
-		set_rights(sinfo, read->d_name);
-		printf("traveling printf yay [%s] [%s] [%s] {%s} \n", filename, read->d_name, sinfo->filename, sinfo->str_rights);
-		set_uid_gid_size(sinfo, read->d_name);
-		printf("what i crash on?\n");
-		set_time(sinfo, read->d_name);
+		treename = create_treename(read->d_name, filename);
+		set_types_name(sinfo, treename, read->d_name);
+		// set_rights(sinfo, treename);
+		// printf("traveling printf yay f[%s] t[%s] d[%s] s_f[%s] {%s} \n", filename, treename, read->d_name, sinfo->filename, sinfo->str_rights);
+		// set_uid_gid_size(sinfo, treename);
+		// printf("what i crash on?\n");
+		// set_time(sinfo, treename);
 		//stat(read->d_name, &stats);
-		if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && read->d_name[0] != '.')
-		{
-			printf("tree mode\n");
-			sinfo->tree = (t_info*)malloc(sizeof(t_info));
-			treename = create_filename(read->d_name, filename);
-			printf("tree[%s]\n", treename);
-			save_data2(sinfo->tree, treename);
-		}
-		else
-			sinfo->tree = NULL;
+		// if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && read->d_name[0] != '.')
+		// {
+		// 	printf("tree mode\n");
+		// 	sinfo->tree = (t_info*)malloc(sizeof(t_info));
+		// 	//treename = create_filename(read->d_name, filename);
+		// 	printf("tree[%s]\n", treename);
+		// 	save_data1(sinfo->tree, treename);
+		// }
+		// else
+		// 	sinfo->tree = NULL;
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
 		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
 		sinfo = sinfo->next;
@@ -296,19 +362,20 @@ void		save_data1(t_info *sinfo, char *filename)
 	closedir(p);
 }
 
-char	*create_filename(char *read, char *filename)
+char		*create_treename(char *read, char *filename)
 {
-	char *ret;
+	//char *ret;
+	char		*ret;
 
 	if (!(strcmp(filename, "./")))
 	{
-		ret = (char*)malloc(sizeof(char) * strlen(read) + 1);
-		//ret[0] = '/';
-		//ret[1] = '/';
-		strcat(ret, read);
-		return ret;
+	// 	ret = (char*)malloc(sizeof(char) * strlen(read) + 1);
+	// 	//ret[0] = '/';
+	// 	//ret[1] = '/';
+	// 	strcat(ret, read);
+		return read;
 	}
-	ret = (char*)malloc(sizeof(char) * strlen(read) + strlen(filename) + 2);
+	ret = (char*)malloc(sizeof(char) + strlen(read) + strlen(filename) + 2);
 	strcpy(ret, filename);
 	strcat(ret, "/");
 	strcat(ret, read);
@@ -316,52 +383,6 @@ char	*create_filename(char *read, char *filename)
 	return ret;
 }
 
-void		save_data2(t_info *sinfo, char *filename)
-{
-	struct stat		stats;
-	struct dirent	*read;
-	DIR				*p;
-	//t_info			*start;
-	//t_info			*tmp;
-
-	//start = *sinfo;
-	//tmp = *sinfo;
-	sinfo->dir_cont = count_dir();
-	p = opendir(filename);
-	printf("old filename is [%s]\n", filename);
-	while ((read = readdir(p)) != NULL)
-	{
-		filename = create_filename(read->d_name, filename);
-		printf("new filename is [%s]\n", filename);
-		set_types_name(sinfo, filename);
-		set_rights(sinfo, filename);
-		printf("traveling printf yay [%s] [%s] [%s] {%s} \n", filename, read->d_name, sinfo->filename, sinfo->str_rights);
-		set_uid_gid_size(sinfo, filename);
-		printf("what i crash on?\n");
-		set_time(sinfo, filename);
-		//stat(read->d_name, &stats);
-		if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)  && filename[0] != '.' */)
-		{
-			printf("tree mode\n");
-			sinfo->tree = (t_info*)malloc(sizeof(t_info));
-			//treename = (char*)malloc(sizeof(char) * strlen(read->d_name) + 2);
-			// strcpy(treename, read->d_name);
-			// strcat(treename, "/");
-			// printf("what is treename [%s]", treename);
-			save_data2(sinfo->tree, filename);
-		}
-		else
-			sinfo->tree = NULL;
-		sinfo->next = (t_info*)malloc(sizeof(t_info));
-		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
-		sinfo = sinfo->next;
-		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
-
-
-	}
-	sinfo->next = NULL;
-	closedir(p);
-}
 void		set_time(t_info *sinfo, char *filename)
 {
 	struct stat	stats;
@@ -374,15 +395,15 @@ void		set_time(t_info *sinfo, char *filename)
 	sinfo->time_sort = stats.st_mtime;
 }
 
-void		set_types_name(t_info *sinfo, char *filename)
+void		set_types_name(t_info *sinfo, char *filename, char *dname)
 {
 	struct stat stats;
 	int l;
 	int k;
 
-	l = strlen(filename);
+	l = strlen(dname);
 	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->filename, filename);
+	strcpy(sinfo->filename, dname);
 	k = stat(filename, &stats);
 	if (S_ISBLK(stats.st_mode))
 		sinfo->file_type = 3;
