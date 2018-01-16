@@ -169,19 +169,23 @@ void		sort_by_r(t_info **sinfo, t_opt opt)
 	t_info *saved_new;
 
 	current = *sinfo;
+	saved_new = *sinfo;
 	while (current->next != NULL)
 	{
-		while (current->next->next != NULL)
-			current = current->next;
-		printf("current is [%s]\n", current->filename);
-		if (!(saved_new->next))
+		while (current->next->next->filename != NULL)
 		{
-			printf("new start [%s]\n", saved_new->filename);
+			printf("next next [%s]\n",current->next->next->filename);
+			current = current->next;
+		}
+		printf("current is [%s]\n", current->filename);
+		if (saved_new == *sinfo)
+		{
 			saved_new = current->next;
 			newstart = current->next;
 			newstart->next = saved_new;
 			//free(current->next);
 			current->next = NULL;
+			printf("new start [%s]\n", saved_new->filename);
 		}
 		else
 		{
@@ -336,9 +340,9 @@ void		save_data1(t_info *sinfo, char *filename)
 		treename = create_treename(read->d_name, filename);
 		set_types_name(sinfo, treename, read->d_name);
 		// set_rights(sinfo, treename);
-		// printf("traveling printf yay f[%s] t[%s] d[%s] s_f[%s] {%s} \n", filename, treename, read->d_name, sinfo->filename, sinfo->str_rights);
 		// set_uid_gid_size(sinfo, treename);
 		// printf("what i crash on?\n");
+//printf("traveling printf yay f[%s] t[%s] d[%s] s_f[%s] {%s} \n", filename, treename, read->d_name, sinfo->filename, sinfo->str_rights);
 		// set_time(sinfo, treename);
 		//stat(read->d_name, &stats);
 		// if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && read->d_name[0] != '.')
@@ -358,7 +362,8 @@ void		save_data1(t_info *sinfo, char *filename)
 
 
 	}
-	sinfo->next = NULL;
+	sinfo = NULL;
+	printf("sinfo exist [%p]\n", sinfo);
 	closedir(p);
 }
 
