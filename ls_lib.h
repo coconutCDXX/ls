@@ -63,5 +63,6 @@ void				ft_putchar(char c);
 char				*create_treename(char *read, char *filename);
 t_opt			set_options_zero(struct s_opt);
 int				check_alpha(char *a, char *b);
+void quick_memtest(t_info *sinfo);
 
 #endif

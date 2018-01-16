@@ -71,18 +71,30 @@ void		read_options(int ac, char **av, char *options)
 	}
 	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", struct_opt.opt_a, struct_opt.opt_l, struct_opt.opt_R, struct_opt.opt_r, struct_opt.opt_t);
 	save_data1(sinfo, "./");
+	quick_memtest(sinfo);
 	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
 	sort_command(sinfo, struct_opt, av);
 }
+void quick_memtest(t_info *sinfo)
+{
+	int i = 0;
 
-
+	while (sinfo)
+	{
+		printf("{%s} %d\n", sinfo->filename, i);
+		i++;
+		if (i == 20)
+			sinfo->next = NULL;
+		sinfo = sinfo->next;
+	}
+}
 void		print_rec(t_info **sinfo, t_opt opt, char **av)
 {
 	t_info *tmp;
 
 	tmp = *sinfo;
 	printf("is tmp alive? [%s]\n", tmp->filename);
-	while (tmp->next != NULL)
+	while (tmp)
 	{
 		printf("printing -> [%s][%d]\n", tmp->filename, (int)strlen(tmp->filename));
 		if (opt.opt_a == TRUE && (tmp->filename[0] == '.'))
@@ -144,17 +156,13 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 
 void		sort_command(t_info *sinfo, t_opt opt, char **av)
 {
-	int a;
-
-	a = 0;
-	//sort_by_alpha(&sinfo);
+	sort_by_alpha(&sinfo);
 	if (opt.opt_t == TRUE)
 	{
 		sort_by_time_xor_rev(&sinfo, opt);
-		a = 1;
 		printf("i sorted by t\n");
 	}
-	else if (opt.opt_r == TRUE && a == 0)
+	if (opt.opt_r == TRUE)
 		sort_by_r(&sinfo, opt);
 	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 	print_rec(&sinfo, opt, av);
@@ -169,31 +177,32 @@ void		sort_by_r(t_info **sinfo, t_opt opt)
 	t_info *saved_new;
 
 	current = *sinfo;
-	saved_new = *sinfo;
+	newstart = *sinfo;
 	while (current->next != NULL)
 	{
-		while (current->next->next->filename != NULL)
+		while (current->next->next)
 		{
-			printf("next next [%s]\n",current->next->next->filename);
+			printf("next next [%p] next [%s][%p]\n",current->next->next, current->next->filename, current->next);
 			current = current->next;
 		}
 		printf("current is [%s]\n", current->filename);
-		if (saved_new == *sinfo)
+		if (newstart == *sinfo)
 		{
 			saved_new = current->next;
 			newstart = current->next;
 			newstart->next = saved_new;
 			//free(current->next);
 			current->next = NULL;
-			printf("new start [%s]\n", saved_new->filename);
+			printf("new start [%s] [%p]\n", saved_new->filename, current->next);
 		}
 		else
 		{
-			saved_new = current->next;
+			saved_new->next = current->next;
 			//free(current->next);
 			current->next = NULL;
+
 			saved_new = saved_new->next;
-			printf("saved_new->next [%s]\n", saved_new->next->filename);
+			printf("saved_new->next [%s]\n", saved_new->filename);
 		}
 		if (opt.opt_R == TRUE && current->tree != NULL)
 			sort_by_r(&(current->tree), opt);
@@ -212,8 +221,9 @@ void			sort_by_alpha(t_info **sinfo)
 
 	start = *sinfo;
 	current = *sinfo;
-	while (current->next && current->next->next)
+	while (current->next)
 	{
+		//printf("stats of cur [%s]\n", current->filename);
 		if (check_alpha(current->filename, current->next->filename))
 		{
 			tmp = current->next;
@@ -235,6 +245,11 @@ void			sort_by_alpha(t_info **sinfo)
 			start = current;
 			current = current->next;
 		}
+		// if (current->tree != NULL)
+		// {
+		// 	printf("tree mode fuck up\n");
+		// 	sort_by_alpha(&(current->tree));
+		// }
 	}
 }
 
@@ -275,11 +290,11 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 
 	start = *sinfo;
 	current = *sinfo;
-	while (current->next && current->next->next)
+	while (current->next)
 	{
 		printf("where are we [%s] [%lld]\n", current->filename, (long long)current->time_sort);
 		//printf("next one [%s] [%lld]\n\n", current->next->filename, (long long)current->next->time_sort);
-		if ((current->time_sort < current->next->time_sort) && opt.opt_r != TRUE)
+		if (current->time_sort < current->next->time_sort)
 		{
 			tmp = current->next;
 			current->next = tmp->next;
@@ -339,22 +354,21 @@ void		save_data1(t_info *sinfo, char *filename)
 	{
 		treename = create_treename(read->d_name, filename);
 		set_types_name(sinfo, treename, read->d_name);
-		// set_rights(sinfo, treename);
-		// set_uid_gid_size(sinfo, treename);
-		// printf("what i crash on?\n");
+		set_rights(sinfo, treename);
+		set_uid_gid_size(sinfo, treename);
+		printf("what i crash on?\n");
 //printf("traveling printf yay f[%s] t[%s] d[%s] s_f[%s] {%s} \n", filename, treename, read->d_name, sinfo->filename, sinfo->str_rights);
-		// set_time(sinfo, treename);
-		//stat(read->d_name, &stats);
-		// if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && read->d_name[0] != '.')
-		// {
-		// 	printf("tree mode\n");
-		// 	sinfo->tree = (t_info*)malloc(sizeof(t_info));
-		// 	//treename = create_filename(read->d_name, filename);
-		// 	printf("tree[%s]\n", treename);
-		// 	save_data1(sinfo->tree, treename);
-		// }
-		// else
-		// 	sinfo->tree = NULL;
+		set_time(sinfo, treename);
+		stat(read->d_name, &stats);
+		if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && read->d_name[0] != '.')
+		{
+			printf("tree mode\n");
+			sinfo->tree = (t_info*)malloc(sizeof(t_info));
+			printf("tree[%s]\n", treename);
+			save_data1(sinfo->tree, treename);
+		}
+		else
+			sinfo->tree = NULL;
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
 		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
 		sinfo = sinfo->next;
@@ -362,6 +376,7 @@ void		save_data1(t_info *sinfo, char *filename)
 
 
 	}
+	//free(sinfo);
 	sinfo = NULL;
 	printf("sinfo exist [%p]\n", sinfo);
 	closedir(p);
