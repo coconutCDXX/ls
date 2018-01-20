@@ -37,43 +37,75 @@ int		main(int ac, char **av)
 
 t_opt	set_options_zero(t_opt struct_opt)
 {
-	struct_opt.opt_a = FALSE;
+	struct_opt.a = FALSE;
 
-	struct_opt.opt_l = FALSE;
+	struct_opt.l = FALSE;
 
-	struct_opt.opt_R = FALSE;
+	struct_opt.R = FALSE;
 
-	struct_opt.opt_r = FALSE;
+	struct_opt.r = FALSE;
 
-	struct_opt.opt_t = FALSE;
+	struct_opt.t = FALSE;
 	return (struct_opt);
 }
 
 void		read_options(int ac, char **av, char *options)
 {
-	t_opt	struct_opt;
+	t_opt	opt;
 	t_info	*sinfo;
 
 	sinfo = (t_info*)malloc(sizeof(t_info));
-	struct_opt = set_options_zero(struct_opt);
+	opt = set_options_zero(opt);
 	if (options != NULL)
 	{
 		if (strchr(options, 'a'))
-			struct_opt.opt_a = TRUE;
+			opt.a = TRUE;
 		if (strchr(options, 'l'))
-			struct_opt.opt_l = TRUE;
+		 	opt.l = TRUE;
 		if (strchr(options, 'R'))
-			struct_opt.opt_R = TRUE;
+			opt.R = TRUE;
 		if (strchr(options, 'r'))
-			struct_opt.opt_r = TRUE;
+			opt.r = TRUE;
 		if (strchr(options, 't'))
-			struct_opt.opt_t = TRUE;
+			opt.t = TRUE;
 	}
-	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", struct_opt.opt_a, struct_opt.opt_l, struct_opt.opt_R, struct_opt.opt_r, struct_opt.opt_t);
-	save_data1(sinfo, "./");
+	printf("cechk alive\n");
+	specific_fileread(ac, av, opt, sinfo);
+	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
+	if (ac == 1)
+	{
+	 save_data1(sinfo, "./");
+
 	quick_memtest(sinfo);
 	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
-	sort_command(sinfo, struct_opt, av);
+	sort_command(sinfo, opt, av);
+	}
+}
+void	specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
+{
+	int x;
+	struct stat stats;
+
+	x = 1;
+	if (ac > 1)
+	{
+		while (ac > 1)
+		{
+			printf("pass b4 alive [%d][%s]\n", ac, av[x]);
+			if (av[x][0] != '-')
+			{
+				if (stat(av[x], &stats) == -1)
+				{
+					printf("av [%s]", av[x]);
+					save_data1(sinfo, av[x]);
+					quick_memtest(sinfo);
+					sort_command(sinfo, opt, av);
+				}
+			}
+			ac--;
+			x++;
+		}
+	}
 }
 void quick_memtest(t_info *sinfo)
 {
@@ -97,7 +129,7 @@ void		print_rec(t_info **sinfo, t_opt opt, char **av)
 	while (tmp)
 	{
 		printf("printing -> [%s][%d]\n", tmp->filename, (int)strlen(tmp->filename));
-		if (opt.opt_a == TRUE && (tmp->filename[0] == '.'))
+		if (opt.a == TRUE && (tmp->filename[0] == '.'))
 		{
 			write_it_all(tmp, opt);
 			tmp = tmp->next;
@@ -112,7 +144,7 @@ void		print_rec(t_info **sinfo, t_opt opt, char **av)
 	}
 	printf("exit loop\n");
 	tmp = *sinfo;
-	while (tmp->next != NULL && opt.opt_R == TRUE)
+	while (tmp->next != NULL && opt.R == TRUE)
 	{
 		if (tmp->tree != NULL)
 			print_rec(&(tmp->tree), opt, av);
@@ -124,7 +156,7 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 {
 	int l;
 
-	if (opt.opt_l == TRUE)
+	if (opt.l == TRUE)
 	{
 			//write(1, "total ", 6);
 			// ft_putnbr(sinfo->dir_cont);
@@ -157,12 +189,12 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 void		sort_command(t_info *sinfo, t_opt opt, char **av)
 {
 	sort_by_alpha(&sinfo);
-	if (opt.opt_t == TRUE)
+	if (opt.t == TRUE)
 	{
 		sort_by_time_xor_rev(&sinfo, opt);
 		printf("i sorted by t\n");
 	}
-	if (opt.opt_r == TRUE)
+	if (opt.r == TRUE)
 		sort_by_r(&sinfo, opt);
 	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 	print_rec(&sinfo, opt, av);
@@ -204,7 +236,7 @@ void		sort_by_r(t_info **sinfo, t_opt opt)
 			saved_new = saved_new->next;
 			printf("saved_new->next [%s]\n", saved_new->filename);
 		}
-		if (opt.opt_R == TRUE && current->tree != NULL)
+		if (opt.R == TRUE && current->tree != NULL)
 			sort_by_r(&(current->tree), opt);
 		current = *sinfo;
 	}
@@ -319,7 +351,7 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 			current = current->next;
 			printf("aliv?\n");
 		}
-		// else if (current->time_sort > current->next->time_sort && opt.opt_r == TRUE)
+		// else if (current->time_sort > current->next->time_sort && opt.r == TRUE)
 		// {
 		// 	printf("this is happening?\n");
 		// 	tmp = current->next;
@@ -329,7 +361,7 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 		// 	current = *sinfo;
 		// 	continue;
 		// }
-		// if (opt.opt_R == TRUE && current->tree != NULL)
+		// if (opt.R == TRUE && current->tree != NULL)
 		// 	sort_by_time_xor_rev(&(current->tree), opt);
 	}
 	//*sinfo = start;
@@ -596,7 +628,7 @@ int		verify_options(char **av, char *ret)
 		a_v++;
 	}
 	ret[i] = '\0';
-	printf("the options are: %s\n", ret);
+	//printf("the options are: %s\n", ret);
 	return 1;
 }
 

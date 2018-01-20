@@ -18,11 +18,11 @@ typedef enum		bools{FALSE, TRUE} boolean;
 
 typedef struct		s_opt
 {
-	boolean		opt_a;
-	boolean		opt_l;
-	boolean		opt_R;
-	boolean		opt_r;
-	boolean		opt_t;
+	boolean		a;
+	boolean		l;
+	boolean		R;
+	boolean		r;
+	boolean		t;
 }				t_opt;
 
 typedef struct		s_info
@@ -64,5 +64,6 @@ char				*create_treename(char *read, char *filename);
 t_opt			set_options_zero(struct s_opt);
 int				check_alpha(char *a, char *b);
 void quick_memtest(t_info *sinfo);
+void specific_fileread(int ac,char **av, t_opt opt, t_info *sinfo);
 
 #endif
