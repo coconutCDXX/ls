@@ -70,16 +70,15 @@ void		read_options(int ac, char **av, char *options)
 			opt.t = TRUE;
 	}
 	printf("cechk alive\n");
-	specific_fileread(ac, av, opt, sinfo);
+	if (ac >= 2)
+		specific_fileread(ac, av, opt, sinfo);
 	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
-	if (ac == 1)
-	{
-	 save_data1(sinfo, "./");
+	save_data1(sinfo, "./");
 
 	quick_memtest(sinfo);
 	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
 	sort_command(sinfo, opt, av);
-	}
+
 }
 void	specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 {
@@ -94,9 +93,9 @@ void	specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 			printf("pass b4 alive [%d][%s]\n", ac, av[x]);
 			if (av[x][0] != '-')
 			{
-				if (stat(av[x], &stats) == -1)
+				if (!(stat(av[x], &stats)))
 				{
-					printf("av [%s]", av[x]);
+					printf("specific check[%s]\n", av[x]);
 					save_data1(sinfo, av[x]);
 					quick_memtest(sinfo);
 					sort_command(sinfo, opt, av);
@@ -107,6 +106,7 @@ void	specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 		}
 	}
 }
+
 void quick_memtest(t_info *sinfo)
 {
 	int i = 0;
@@ -299,15 +299,17 @@ int		check_alpha(char *a, char *b)
 	if (b[i] == '.')
 		i++;
 	if (a[j] >= 65 && a[j] <= 90 && !(b[i] >= 65 && b[i] <= 90))
-		if (a[j] + 32 > b[i])
+	{	if (a[j] + 32 > b[i])
 			return (1);
 		else
 			return (0);
+		}
 	if (b[i] >= 65 && b[i] <= 90 && !(a[j] >= 65 && a[j] <= 90))
-		if (b[i] + 32 < a[j])
+		{if (b[i] + 32 < a[j])
 			return (1);
 		else
 			return (0);
+		}
 	if (a[j] > b[i])
 		return (1);
 	if (a[j] == b[i])
