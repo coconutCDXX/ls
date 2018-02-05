@@ -43,27 +43,28 @@ typedef struct		s_info
 int				verify_options(char **av, char *ret);
 int				valid_options(char o, char *cmp_options);
 void				read_options(int ac, char **av, char *options);
-void				sort_command(t_info *sinfo, t_opt opt, char **av);
-void				print_rec(t_info **sinfo, t_opt opt, char **av);
+void				sort_command(t_info *sinfo, t_opt opt);
+void				print_rec(t_info **sinfo, t_opt opt);
 void				write_it_all(t_info *sinfo, t_opt opt);
 void				sort_by_r(t_info **sinfo, t_opt opt);
 void				sort_by_time_xor_rev(t_info **sinfo, t_opt opt);
 void				sort_by_alpha(t_info **sinfo);
 void				save_data1(t_info *sinfo, char *filename);
-//void				save_data2(t_info *sinfo, char *filename);
+void				save_data2(t_info *sinfo, char *filename, int ac, int x);
 void				set_time(t_info *sinfo, char *filename);
 void				set_types_name(t_info *sinfo, char *filename, char *dname);
 void				set_rights(t_info *sinfo, char *filename);
 void				set_rights_USR_GRP(t_info *sinfo, struct stat);
 void				set_rights_OTH(t_info *sinfo, struct stat);
 void				set_uid_gid_size(t_info *sinfo, char *filename);
-int					count_dir(void);
+int				count_dir(char *filename);
 void				ft_putnbr(int n);
 void				ft_putchar(char c);
 char				*create_treename(char *read, char *filename);
 t_opt			set_options_zero(struct s_opt);
 int				check_alpha(char *a, char *b);
-void quick_memtest(t_info *sinfo);
-void specific_fileread(int ac,char **av, t_opt opt, t_info *sinfo);
+void				specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo);
+void				quick_memtest(t_info *sinfo);
+int				check_av(char **av, int ac);
 
 #endif
