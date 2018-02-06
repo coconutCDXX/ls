@@ -64,6 +64,34 @@ int		check_av(char **av, int ac)
 	printf("i ret 0\n\n");
 	return 0;
 }
+
+char		**folders_av(int ac, char **av, int *nf, t_opt opt)
+{
+	int x;
+	int y;
+	char **ret;
+	struct stat stats;
+
+	x = 1;
+	y = 0;
+	ret = (char**)malloc(sizeof(char*) * ac);
+	while (av[x])
+	{
+		printf("av[x] [%s]\n", av[x]);
+		if (!(stat(av[x], &stats)) && (S_ISDIR(stats.st_mode)))
+		{
+			ret[y] = (char*)malloc(sizeof(char) * strlen(av[x]) + 1);
+			strcpy(ret[y], av[x]);
+			//ret[strlen(av[x])] = NULL;
+			y++;
+		}
+		else if (!(stat(av[x], &stats)) && (!(S_ISDIR(stats.st_mode))))
+			*nf = *nf + 1;
+		x++;
+	}
+	sort_folders(ret, opt);
+	return (ret);
+}
 void		read_options(int ac, char **av, char *options)
 {
 	t_opt	opt;
@@ -85,9 +113,9 @@ void		read_options(int ac, char **av, char *options)
 			opt.t = TRUE;
 	}
 	printf("cechk alive\n");
+	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
 	if (check_av(av, ac))
 		specific_fileread(ac, av, opt, sinfo);
-	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
 	save_data1(sinfo, "./");
 
 	//quick_memtest(sinfo);
@@ -95,12 +123,17 @@ void		read_options(int ac, char **av, char *options)
 	sort_command(sinfo, opt);
 
 }
-void	specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
+void			specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 {
 	int x;
 	struct stat stats;
+	char **folders;
+	int nonf;
 
 	x = 1;
+	nonf = 0;
+	folders = folders_av(ac, av, &nonf, opt);
+	printf("death--------------------[%d]\n", nonf);
 	while (ac > 1)
 	{
 		printf("pass b4 alive [%d][%s]\n", ac, av[x]);
@@ -108,34 +141,53 @@ void	specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 		{
 			if (!(stat(av[x], &stats)))
 			{
-				printf("specific check[%s]\n", av[x]);
-				if (S_ISDIR(stats.st_mode))
+				if (!(S_ISDIR(stats.st_mode)))
 				{
-					save_data1(sinfo, av[x]);
-					printf("secondary crash report [%s] [%s] [%s]\n", sinfo->filename, sinfo->next->filename,sinfo->next->next->filename);
-					//quick_memtest(sinfo);
-				}
-				else
-				{
-					save_data2(sinfo, av[x], ac - 1, x);
+					save_data2(sinfo, av[x], nonf, x);
 					printf("out of save2\n\n");
+					nonf--;
+					// save_data1(sinfo, av[x]);
+					// printf("secondary crash report [%s] [%s] [%s]\n", sinfo->filename, sinfo->next->filename,sinfo->next->next->filename);
+					// //quick_memtest(sinfo);
 				}
 			}
 			else
 			{
+				printf("====[%s]==== ERROR\n", av[x]);
 				//error go next
 			}
 		}
 		if (ac == 2)
 		{
-			sort_command(sinfo, opt);
+			if (sinfo->filename)
+				sort_command(sinfo, opt);
+			if (folders != NULL)
+				save_folders(folders, opt);
 			exit (1);
 		}
 		ac--;
 		x++;
 	}
 }
-void				save_data2(t_info *sinfo, char *filename, int ac, int x)
+
+void				save_folders(char **f, t_opt opt)
+{
+	int x;
+	t_info	*sinfo;
+
+	x = 0;
+	while (f[x])
+	{
+		sinfo = (t_info*)malloc(sizeof(t_info));
+		save_data1(sinfo, f[x]);
+		printf("SAVE FOLDERS REVIEW [%s] [%s]\n", sinfo->filename, f[x]);
+		sort_command(sinfo, opt);
+		free(sinfo);
+		sinfo = NULL;
+		x++;
+	}
+}
+void				save_data2(t_info *sinfo, char *filename, int nf, int x)
 {
 	//struct stat		stats;
 	//struct dirent	*read;
@@ -146,7 +198,7 @@ void				save_data2(t_info *sinfo, char *filename, int ac, int x)
 	//p = opendir(filename);
 	// while ((read = readdir(p)) != NULL)
 	// {
-		printf("!![%d] [%d]!!", x, ac);
+		printf("!![%d] [%d]!!", x, nf);
 		if (x > 1)
 		{
 			printf("YOU SHALL NOT PASS\n");
@@ -178,7 +230,7 @@ void				save_data2(t_info *sinfo, char *filename, int ac, int x)
 		// }
 		// else
 		sinfo->tree = NULL;
-		if (ac == 1)
+		if (nf == 1)
 			sinfo->next = NULL;
 	//	sinfo->next = (t_info*)malloc(sizeof(t_info));
 		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
@@ -194,86 +246,6 @@ void				save_data2(t_info *sinfo, char *filename, int ac, int x)
 	//closedir(p);
 }
 
-void quick_memtest(t_info *sinfo)
-{
-	int i = 0;
-
-	while (sinfo)
-	{
-		printf("{%s} %d\n", sinfo->filename, i);
-		i++;
-		if (i == 20)
-			sinfo->next = NULL;
-		sinfo = sinfo->next;
-	}
-}
-void		print_rec(t_info **sinfo, t_opt opt)
-{
-	t_info *tmp;
-
-	tmp = *sinfo;
-	printf("is tmp alive? [%s]\n", tmp->filename);
-	while (tmp)
-	{
-		printf("printing -> [%s][%d]\n", tmp->filename, (int)strlen(tmp->filename));
-		if (opt.a == TRUE && (tmp->filename[0] == '.'))
-		{
-			write_it_all(tmp, opt);
-			tmp = tmp->next;
-			continue;
-		}
-		if (!(tmp->filename[0] == '.'))
-		{
-			write_it_all(tmp, opt);
-		}
-		tmp = tmp->next;
-		printf("[%p]\n\n", tmp);
-	}
-	printf("exit loop\n");
-	tmp = *sinfo;
-	while (tmp->next != NULL && opt.R == TRUE)
-	{
-		if (tmp->tree != NULL)
-			print_rec(&(tmp->tree), opt);
-		tmp = tmp->next;
-	}
-}
-
-void		write_it_all(t_info *sinfo, t_opt opt)
-{
-	int l;
-
-	if (opt.l == TRUE)
-	{
-			//write(1, "total ", 6);
-			// ft_putnbr(sinfo->dir_cont);
-			// write(1, "\n", 1);
-			write(1, sinfo->str_rights, 10);
-			ft_putchar(' ');
-			ft_putnbr(sinfo->file_type);
-			ft_putchar(' ');
-			l = strlen(sinfo->user_name);
-			write(1, sinfo->user_name, l);
-			ft_putchar(' ');
-			l = strlen(sinfo->grp_name);
-			write(1, sinfo->grp_name, l);
-			ft_putchar('\t');
-			ft_putnbr(sinfo->bytes);
-			ft_putchar(' ');
-			l = strlen(sinfo->date);
-			write(1, sinfo->date, l);
-			ft_putchar(' ');
-			// l = strlen(sinfo->filename);
-			// write(1, sinfo->filename, l);
-			// return;
-	}
-	l = strlen(sinfo->filename);
-	write(1, sinfo->filename, l);
-	//printf("\nwhats sinfo? [%s]", sinfo->filename);
-	printf("--end write [%d]\n", l);
-}
-
-
 void		save_data1(t_info *sinfo, char *filename)
 {
 	struct stat		stats;
@@ -285,7 +257,7 @@ void		save_data1(t_info *sinfo, char *filename)
 
 	//start = *sinfo;
 	//tmp = *sinfo;
-	printf("acknowledge commander\n\n");
+	printf("acknowledge commander---- save_data1\n\n");
 	sinfo->dir_cont = count_dir(filename);
 	p = opendir(filename);
 	printf("dir count is %d\n", sinfo->dir_cont);
@@ -314,6 +286,8 @@ void		save_data1(t_info *sinfo, char *filename)
 			sinfo->next->dir_cont = sinfo->dir_cont - 1;
 			sinfo = sinfo->next;
 		}
+		else
+			sinfo->next = NULL;
 		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
 		//printf("[%d]--[%s]--[%s]\n", sinfo->dir_cont, sinfo->user_name, sinfo->str_rights);
 
@@ -347,130 +321,7 @@ char		*create_treename(char *read, char *filename)
 	return ret;
 }
 
-void		set_time(t_info *sinfo, char *filename)
-{
-	struct stat	stats;
-	int			l;
 
-	stat(filename, &stats);
-	l = strlen(ctime(&stats.st_mtime));
-	sinfo->date = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->date, ctime(&stats.st_mtime));
-	sinfo->time_sort = stats.st_mtime;
-}
-
-void		set_types_name(t_info *sinfo, char *filename, char *dname)
-{
-	struct stat stats;
-	int l;
-	int k;
-
-	l = strlen(dname);
-	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->filename, dname);
-	k = stat(filename, &stats);
-	if (S_ISBLK(stats.st_mode))
-		sinfo->file_type = 3;
-	if (S_ISCHR(stats.st_mode))
-		sinfo->file_type = 4;
-	if (S_ISDIR(stats.st_mode))
-		sinfo->file_type = 2;
-	if (S_ISFIFO(stats.st_mode))
-		sinfo->file_type = 5;
-	if (S_ISREG(stats.st_mode))
-		sinfo->file_type = 1;
-	if (S_ISLNK(stats.st_mode))
-		sinfo->file_type = 6;
-	printf("sinfo->file_type [%d] [%d]\n", sinfo->file_type, k);
-	if (k == -1)
-		perror("Error: ");
-}
-
-void		set_rights(t_info *sinfo, char *filename)
-{
-	struct stat stats;
-
-	stat(filename, &stats);
-	sinfo->str_rights = (char*)malloc(sizeof(char) * 11);
-	if (sinfo->file_type == 1)
-		sinfo->str_rights[0] = '-';
-	if (sinfo->file_type == 2)
-		sinfo->str_rights[0] = 'd';
-	if (sinfo->file_type == 3)
-		sinfo->str_rights[0] = 'b';
-	if (sinfo->file_type == 4)
-		sinfo->str_rights[0] = 'c';
-	if (sinfo->file_type == 5)
-		sinfo->str_rights[0] = 'f';
-	if (sinfo->file_type == 6)
-		sinfo->str_rights[0] = 'l';
-	set_rights_USR_GRP(sinfo, stats);
-}
-
-void		set_rights_USR_GRP(t_info *sinfo, struct stat stats)
-{
-	if (stats.st_mode & S_IRUSR)
-		sinfo->str_rights[1] = 'r';
-	else
-		sinfo->str_rights[1] = '-';
-	if (stats.st_mode & S_IWUSR)
-		sinfo->str_rights[2] = 'w';
-	else
-		sinfo->str_rights[2] = '-';
-	if (stats.st_mode & S_IXUSR)
-		sinfo->str_rights[3] = 'x';
-	else
-		sinfo->str_rights[3] = '-';
-	if (stats.st_mode & S_IRGRP)
-		sinfo->str_rights[4] = 'r';
-	else
-		sinfo->str_rights[4] = '-';
-	if (stats.st_mode & S_IWGRP)
-		sinfo->str_rights[5] = 'w';
-	else
-		sinfo->str_rights[5] = '-';
-	if (stats.st_mode & S_IXGRP)
-		sinfo->str_rights[6] = 'x';
-	else
-		sinfo->str_rights[6] = '-';
-	set_rights_OTH(sinfo, stats);
-}
-
-void		set_rights_OTH(t_info *sinfo, struct stat stats)
-{
-	if (stats.st_mode & S_IROTH)
-		sinfo->str_rights[7] = 'r';
-	else
-		sinfo->str_rights[7] = '-';
-	if (stats.st_mode & S_IWOTH)
-		sinfo->str_rights[8] = 'w';
-	else
-		sinfo->str_rights[8] = '-';
-	if (stats.st_mode & S_IXOTH)
-		sinfo->str_rights[9] = 'x';
-	else
-		sinfo->str_rights[9] = '-';
-	sinfo->str_rights[10] = '\0';
-}
-
-void		set_uid_gid_size(t_info *sinfo, char *filename)
-{
-	struct stat stats;
-	struct passwd *person;
-	struct group *grp;
-	int l;
-
-	stat(filename, &stats);
-	person = getpwuid(stats.st_uid);
-	l = strlen(person->pw_name);
-	sinfo->user_name = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->user_name, person->pw_name);
-	grp = getgrgid(stats.st_gid);
-	l = strlen(grp->gr_name);
-	sinfo->grp_name = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->grp_name, grp->gr_name);
-	sinfo->bytes = stats.st_size;
-}
 
 int		count_dir(char *filename)
 {

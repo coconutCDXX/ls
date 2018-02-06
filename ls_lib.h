@@ -50,7 +50,7 @@ void				sort_by_r(t_info **sinfo, t_opt opt);
 void				sort_by_time_xor_rev(t_info **sinfo, t_opt opt);
 void				sort_by_alpha(t_info **sinfo);
 void				save_data1(t_info *sinfo, char *filename);
-void				save_data2(t_info *sinfo, char *filename, int ac, int x);
+void				save_data2(t_info *sinfo, char *filename, int nf, int x);
 void				set_time(t_info *sinfo, char *filename);
 void				set_types_name(t_info *sinfo, char *filename, char *dname);
 void				set_rights(t_info *sinfo, char *filename);
@@ -66,5 +66,8 @@ int				check_alpha(char *a, char *b);
 void				specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo);
 void				quick_memtest(t_info *sinfo);
 int				check_av(char **av, int ac);
+char				**folders_av(int ac, char **av, int *nf, t_opt opt);
+void				sort_folders(char **ret, t_opt opt);
+void				save_folders(char **f, t_opt opt);
 
 #endif

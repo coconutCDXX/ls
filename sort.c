@@ -92,6 +92,7 @@ void			sort_by_alpha(t_info **sinfo)
 		{
 			start = current;
 			current = current->next;
+			printf("new start[%s]\n", current->filename);
 		}
 		// if (current->tree != NULL)
 		// {
@@ -184,4 +185,24 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 	}
 	//*sinfo = start;
 	printf("whats the new start [%s]\n", start->filename);
+}
+
+void			sort_folders(char **ret, t_opt opt)
+{
+	int	x;
+	char	*tmp;
+
+	x = 0;
+	while (ret[x + 1] != NULL)
+	{
+		if (check_alpha(ret[x], ret[x + 1]))
+		{
+			tmp = ret[x + 1];
+			ret[x + 1] = ret[x];
+			ret[x] = tmp;
+			x = 0;
+			continue;
+		}
+		x++;
+	}
 }
