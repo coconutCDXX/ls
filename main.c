@@ -82,6 +82,7 @@ char		**folders_av(int ac, char **av, int *nf, t_opt opt)
 		{
 			ret[y] = (char*)malloc(sizeof(char) * strlen(av[x]) + 1);
 			strcpy(ret[y], av[x]);
+			printf("folders array ret[%s]\n", ret[y]);
 			//ret[strlen(av[x])] = NULL;
 			y++;
 		}
@@ -136,7 +137,7 @@ void			specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 	printf("death--------------------[%d]\n", nonf);
 	while (ac > 1)
 	{
-		printf("pass b4 alive [%d][%s]\n", ac, av[x]);
+		printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
 		if (av[x][0] != '-')
 		{
 			if (!(stat(av[x], &stats)))
@@ -246,6 +247,8 @@ void				save_data2(t_info *sinfo, char *filename, int nf, int x)
 	//closedir(p);
 }
 
+
+
 void		save_data1(t_info *sinfo, char *filename)
 {
 	struct stat		stats;
@@ -320,8 +323,6 @@ char		*create_treename(char *read, char *filename)
 	//strcat(ret, "/");
 	return ret;
 }
-
-
 
 int		count_dir(char *filename)
 {

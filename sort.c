@@ -7,7 +7,7 @@ void		sort_command(t_info *sinfo, t_opt opt)
 	printf("i sorted by alpha!!!!!!!\n");
 	if (opt.t == TRUE)
 	{
-		sort_by_time_xor_rev(&sinfo, opt);
+		sort_by_time(&sinfo, opt);
 		printf("i sorted by t\n");
 	}
 	if (opt.r == TRUE)
@@ -133,7 +133,7 @@ int		check_alpha(char *a, char *b)
 		return (check_alpha(a + 1, b + 1));
 	return (0);
 }
-void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
+void		sort_by_time(t_info **sinfo, t_opt opt)
 {
 	t_info *current;
 	t_info *tmp;
@@ -143,7 +143,7 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 	current = *sinfo;
 	while (current->next)
 	{
-		printf("where are we [%s] [%lld]\n", current->filename, (long long)current->time_sort);
+		//printf("where are we [%s] [%lld]\n", current->filename, (long long)current->time_sort);
 		//printf("next one [%s] [%lld]\n\n", current->next->filename, (long long)current->next->time_sort);
 		if (current->time_sort < current->next->time_sort)
 		{
@@ -154,7 +154,7 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 			{
 				*sinfo = tmp;
 				current = *sinfo;
-				printf("new start![%s]\n", current->filename);
+				//printf("new start![%s]\n", current->filename);
 			}
 			else
 			{
@@ -170,36 +170,77 @@ void		sort_by_time_xor_rev(t_info **sinfo, t_opt opt)
 			current = current->next;
 			printf("aliv?\n");
 		}
-		// else if (current->time_sort > current->next->time_sort && opt.r == TRUE)
-		// {
-		// 	printf("this is happening?\n");
-		// 	tmp = current->next;
-		// 	current->next->next = current;
-		// 	current = tmp;
-		// 	free(tmp);
-		// 	current = *sinfo;
-		// 	continue;
-		// }
-		// if (opt.R == TRUE && current->tree != NULL)
-		// 	sort_by_time_xor_rev(&(current->tree), opt);
 	}
-	//*sinfo = start;
 	printf("whats the new start [%s]\n", start->filename);
 }
 
-void			sort_folders(char **ret, t_opt opt)
+void			sort_folders(char **f, t_opt opt)
 {
 	int	x;
 	char	*tmp;
 
 	x = 0;
-	while (ret[x + 1] != NULL)
+	while (f[x + 1] != NULL)
 	{
-		if (check_alpha(ret[x], ret[x + 1]))
+		if (check_alpha(f[x], f[x + 1]))
 		{
-			tmp = ret[x + 1];
-			ret[x + 1] = ret[x];
-			ret[x] = tmp;
+			tmp = f[x + 1];
+			f[x + 1] = f[x];
+			f[x] = tmp;
+			x = 0;
+			continue;
+		}
+		x++;
+	}
+	if (opt.t)
+		sort_time_folders(f);
+	if (opt.r)
+		f = sort_rev_folders(f);
+}
+
+char			**sort_rev_folders(char **f)
+{
+	int	y;
+	int	x;
+	int	z;
+	char	**new;
+
+	y = 0;
+	x = 0;
+	while (f[y])
+		y++;
+	new = (char**)malloc(sizeof(char*) * y);
+	while (y - x >= 0)
+	{
+		z = strlen(f[y - x]);
+		new[x] = (char*)malloc(sizeof(char) * z + 1);
+		strcpy(new[x], f[y - x]);
+		x++;
+	}
+	return (new);
+}
+
+time_t		check_time(char *t)
+{
+	struct stat	stats;
+
+	stat(t, &stats);
+	return (stats.st_mtime);
+}
+
+void			sort_time_folders(char **f)
+{
+	int x;
+	char *tmp;
+
+	x = 0;
+	while (f[x + 1] != NULL)
+	{
+		if (check_time(f[x]) < check_time(f[x + 1]))
+		{
+			tmp = f[x + 1];
+			f[x + 1] = f[x];
+			f[x] = tmp;
 			x = 0;
 			continue;
 		}

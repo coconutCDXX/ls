@@ -24,10 +24,14 @@ void		print_rec(t_info **sinfo, t_opt opt)
 	}
 	printf("exit loop\n");
 	tmp = *sinfo;
-	while (tmp->next != NULL && opt.R == TRUE)
+	printf("++++++++[%s] [%s]\n", tmp->filename, tmp->next->filename);
+	while (tmp && opt.R == TRUE)
 	{
 		if (tmp->tree != NULL)
+		{
+			printf("i found a LITTLE TREE! [%s]\n",tmp->tree->filename);
 			print_rec(&(tmp->tree), opt);
+		}
 		tmp = tmp->next;
 	}
 }
