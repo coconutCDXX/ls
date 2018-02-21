@@ -5,10 +5,8 @@ void		print_rec(t_info **sinfo, t_opt opt)
 	t_info *tmp;
 
 	tmp = *sinfo;
-	printf("is tmp alive? [%s]\n", tmp->filename);
 	while (tmp)
 	{
-		printf("printing -> [%s][%d]\n", tmp->filename, (int)strlen(tmp->filename));
 		if (opt.a == TRUE && (tmp->filename[0] == '.'))
 		{
 			write_it_all(tmp, opt);
@@ -16,15 +14,11 @@ void		print_rec(t_info **sinfo, t_opt opt)
 			continue;
 		}
 		if (!(tmp->filename[0] == '.'))
-		{
 			write_it_all(tmp, opt);
-		}
 		tmp = tmp->next;
-		printf("[%p]\n\n", tmp);
 	}
 	printf("exit loop\n");
 	tmp = *sinfo;
-	printf("++++++++[%s] [%s]\n", tmp->filename, tmp->next->filename);
 	while (tmp && opt.R == TRUE)
 	{
 		if (tmp->tree != NULL)
@@ -67,5 +61,25 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 	l = strlen(sinfo->filename);
 	write(1, sinfo->filename, l);
 	//printf("\nwhats sinfo? [%s]", sinfo->filename);
-	printf("--end write [%d]\n", l);
+	printf("\n--end write [%d]\n\n\n", l);
+}
+
+void				print_errors(char **av)
+{
+	int x;
+	int l;
+	struct stat stats;
+
+	x = 1;
+	while (av[x])
+	{
+		if (stat(av[x], &stats) && av[x][0] != '-')
+		{
+			write(1, "ls: cannot access '", 19);
+			l = strlen(av[x]);
+			write(1, av[x], l);
+			write(1, "': No such file or directory\n", 29);
+		}
+		x++;
+	}
 }

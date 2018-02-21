@@ -1,5 +1,25 @@
 #include "ls_lib.h"
 
+void			set_data(t_info *sinfo, char *treename, char *name)
+{
+	struct stat		stats;
+
+	set_types_name(sinfo, treename, name);
+	set_rights(sinfo, treename);
+	set_uid_gid_size(sinfo, treename);
+	set_time(sinfo, treename);
+	stat(name, &stats);
+	if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && name[0] != '.')
+	{
+		printf("tree mode\n");
+		sinfo->tree = (t_info*)malloc(sizeof(t_info));
+		printf("tree[%s]\n", treename);
+		save_data1(sinfo->tree, treename);
+	}
+	else
+		sinfo->tree = NULL;
+}
+
 void		set_time(t_info *sinfo, char *filename)
 {
 	struct stat	stats;
@@ -82,15 +102,15 @@ void		set_rights_USR_GRP(t_info *sinfo, struct stat stats)
 		sinfo->str_rights[5] = 'w';
 	else
 		sinfo->str_rights[5] = '-';
-	if (stats.st_mode & S_IXGRP)
-		sinfo->str_rights[6] = 'x';
-	else
-		sinfo->str_rights[6] = '-';
 	set_rights_OTH(sinfo, stats);
 }
 
 void		set_rights_OTH(t_info *sinfo, struct stat stats)
 {
+	if (stats.st_mode & S_IXGRP)
+	sinfo->str_rights[6] = 'x';
+	else
+	sinfo->str_rights[6] = '-';
 	if (stats.st_mode & S_IROTH)
 		sinfo->str_rights[7] = 'r';
 	else

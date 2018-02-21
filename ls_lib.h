@@ -40,23 +40,20 @@ typedef struct		s_info
 	struct s_info	*tree;
 }				t_info;
 
-typedef struct		s_fold
-{
-	struct s_info	*data;
-	struct s_fold	*next;
-}				t_fold;
 
-int				verify_options(char **av, char *ret);
+void				verify_options(char **av, char *ret);
 int				valid_options(char o, char *cmp_options);
 void				read_options(int ac, char **av, char *options);
 void				sort_command(t_info *sinfo, t_opt opt);
 void				print_rec(t_info **sinfo, t_opt opt);
 void				write_it_all(t_info *sinfo, t_opt opt);
+void				print_errors(char **av);
 void				sort_by_r(t_info **sinfo, t_opt opt);
 void				sort_by_time(t_info **sinfo, t_opt opt);
 void				sort_by_alpha(t_info **sinfo);
 void				save_data1(t_info *sinfo, char *filename);
-void				save_data2(t_info *sinfo, char *filename, int nf, int x);
+void				save_data2(t_info *sinfo, char *filename, int nf, int tf);
+void				set_data(t_info *sinfo, char *treename, char *name);
 void				set_time(t_info *sinfo, char *filename);
 void				set_types_name(t_info *sinfo, char *filename, char *dname);
 void				set_rights(t_info *sinfo, char *filename);
@@ -67,9 +64,11 @@ int				count_dir(char *filename);
 void				ft_putnbr(int n);
 void				ft_putchar(char c);
 char				*create_treename(char *read, char *filename);
-t_opt			set_options_zero(struct s_opt);
+t_opt			set_options(struct s_opt, char *options);
 int				check_alpha(char *a, char *b);
-void				specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo);
+int				check_alpha_bis(char x, char y);
+char				**specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo);
+void				end_specific_file(t_info *sinfo, t_opt opt, char **av);
 int				check_av(char **av, int ac);
 char				**folders_av(int ac, char **av, int *nf, t_opt opt);
 void				sort_folders(char **f, t_opt opt);
@@ -77,5 +76,6 @@ char				**sort_rev_folders(char **f);
 void				sort_time_folders(char **f);
 time_t			check_time(char *t);
 void				save_folders(char **f, t_opt opt);
+
 
 #endif
