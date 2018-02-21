@@ -9,7 +9,7 @@ void			set_data(t_info *sinfo, char *treename, char *name)
 	set_uid_gid_size(sinfo, treename);
 	set_time(sinfo, treename);
 	stat(name, &stats);
-	if ( sinfo->str_rights[0] == 'd'/*S_ISDIR(stats.st_mode)*/  && name[0] != '.')
+	if (sinfo->str_rights[0] == 'd' && (strcmp(name, "..") != 0) && (strcmp(name, ".") != 0))
 	{
 		printf("tree mode\n");
 		sinfo->tree = (t_info*)malloc(sizeof(t_info));
