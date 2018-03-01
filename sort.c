@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sort.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
+/*   Updated: 2018/02/28 15:35:07 by cwartell         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ls_lib.h"
 
-void		sort_command(t_info *sinfo, t_opt opt)
+void	sort_command(t_info *sinfo, t_opt opt)
 {
 	printf("enterring command control sort over over\n");
 	sort_by_alpha(&sinfo);
@@ -15,11 +27,9 @@ void		sort_command(t_info *sinfo, t_opt opt)
 	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 	print_rec(&sinfo, opt);
 	printf("print all done return\n");
-	// if R print all else just print
-	// if a or l print addition info
 }
 
-void		sort_by_r(t_info **sinfo, t_opt opt)
+void	sort_by_r(t_info **sinfo, t_opt opt)
 {
 	t_info *newstart;
 	t_info *current;
@@ -52,7 +62,8 @@ void		sort_by_r(t_info **sinfo, t_opt opt)
 	saved_new->next->next = NULL;
 	*sinfo = newstart;
 }
-void			sort_by_alpha(t_info **sinfo)
+
+void	sort_by_alpha(t_info **sinfo)
 {
 	t_info *current;
 	t_info *tmp;
@@ -83,6 +94,29 @@ void			sort_by_alpha(t_info **sinfo)
 	}
 }
 
+// void	sort_trees(t_info **sinfo)
+// {
+// 	t_info *current;
+// 	t_info *start;
+//
+// 	current = *sinfo;
+// 	start = *sinfo;
+// 	while (current->next)
+// 	{
+// 		if (current->tree != NULL)
+// 		{
+// 			current = current->tree;
+// 			while (current->next)
+// 			{
+// 				sort_by_alpha(&current);
+// 				current = current->next;
+// 			}
+// 		}
+// 		else
+// 			start = start->next;
+// 	}
+// }
+
 int		check_alpha(char *a, char *b)
 {
 	int i;
@@ -90,8 +124,8 @@ int		check_alpha(char *a, char *b)
 
 	j = 0;
 	i = 0;
-	if(!(strcmp(b, "..")) && !(strcmp(a, ".")))
-		return 0;
+	if (!(strcmp(b, "..")) && !(strcmp(a, ".")))
+		return (0);
 	if (a[j] == '.')
 		j++;
 	if (b[i] == '.')
@@ -104,7 +138,7 @@ int		check_alpha(char *a, char *b)
 			return (0);
 	}
 	if (check_alpha_bis(b[i], a[j]) != 2)
-		return(check_alpha_bis(b[i], a[j]));
+		return (check_alpha_bis(b[i], a[j]));
 	if (a[j] == b[i])
 		return (check_alpha(a + 1, b + 1));
 	return (0);
@@ -123,7 +157,8 @@ int		check_alpha_bis(char x, char y)
 		return (1);
 	return (2);
 }
-void		sort_by_time(t_info **sinfo, t_opt opt)
+
+void	sort_by_time(t_info **sinfo, t_opt opt)
 {
 	t_info *current;
 	t_info *tmp;
@@ -154,9 +189,9 @@ void		sort_by_time(t_info **sinfo, t_opt opt)
 	}
 }
 
-void			sort_folders(char **f, t_opt opt)
+void	sort_folders(char **f, t_opt opt)
 {
-	int	x;
+	int		x;
 	char	*tmp;
 
 	x = 0;
@@ -178,11 +213,11 @@ void			sort_folders(char **f, t_opt opt)
 		f = sort_rev_folders(f);
 }
 
-char			**sort_rev_folders(char **f)
+char	**sort_rev_folders(char **f)
 {
-	int	y;
-	int	x;
-	int	z;
+	int		y;
+	int		x;
+	int		z;
 	char	**new;
 
 	y = 0;
@@ -201,7 +236,7 @@ char			**sort_rev_folders(char **f)
 	return (new);
 }
 
-time_t		check_time(char *t)
+time_t	check_time(char *t)
 {
 	struct stat	stats;
 
@@ -209,10 +244,10 @@ time_t		check_time(char *t)
 	return (stats.st_mtime);
 }
 
-void			sort_time_folders(char **f)
+void	sort_time_folders(char **f)
 {
-	int x;
-	char *tmp;
+	int		x;
+	char	*tmp;
 
 	x = 0;
 	while (f[x + 1] != NULL)

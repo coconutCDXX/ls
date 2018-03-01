@@ -1,64 +1,73 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
+/*   Updated: 2018/02/28 15:34:03 by cwartell         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ls_lib.h"
 
 int		main(int ac, char **av)
 {
-	char options[6];
+	char	options[6];
 
 	verify_options(av, options);
 	printf("options are [%s]\n", options);
 	read_options(ac, av, options);
-	return 0;
+	return (0);
 }
 
 t_opt	set_options_zero(t_opt struct_opt, char *options)
 {
 	struct_opt.a = FALSE;
-
 	struct_opt.l = FALSE;
-
 	struct_opt.R = FALSE;
-
 	struct_opt.r = FALSE;
-
 	struct_opt.t = FALSE;
 	if (options != NULL)
 	{
 		if (strchr(options, 'a'))
-		struct_opt.a = TRUE;
+			struct_opt.a = TRUE;
 		if (strchr(options, 'l'))
-		struct_opt.l = TRUE;
+			struct_opt.l = TRUE;
 		if (strchr(options, 'R'))
-		struct_opt.R = TRUE;
+			struct_opt.R = TRUE;
 		if (strchr(options, 'r'))
-		struct_opt.r = TRUE;
+			struct_opt.r = TRUE;
 		if (strchr(options, 't'))
-		struct_opt.t = TRUE;
+			struct_opt.t = TRUE;
 	}
 	return (struct_opt);
 }
+
 int		check_av(char **av, int ac)
 {
-	int x;
+	int		x;
 
 	x = 1;
 	while (ac > 1)
 	{
 		if (av[x][0] != '-')
-			return 1;
+			return (1);
 		printf("[%d][%d]\n", x, ac);
 		x++;
 		ac--;
 	}
 	printf("i ret 0\n\n");
-	return 0;
+	return (0);
 }
 
-char		**folders_av(int ac, char **av, int *nf, t_opt opt)
+char	**folders_av(int ac, char **av, int *nf, t_opt opt)
 {
-	int x;
-	int y;
-	char **ret;
-	struct stat stats;
+	int			x;
+	int			y;
+	char		**ret;
+	struct stat	stats;
 
 	x = 1;
 	y = 0;
@@ -71,21 +80,22 @@ char		**folders_av(int ac, char **av, int *nf, t_opt opt)
 			ret[y] = (char*)malloc(sizeof(char) * strlen(av[x]) + 1);
 			strcpy(ret[y], av[x]);
 			printf("folders array ret[%s]\n", ret[y]);
-			//ret[strlen(av[x])] = NULL;
 			y++;
 		}
 		else if (!(stat(av[x], &stats)) && (!(S_ISDIR(stats.st_mode))))
 			*nf = *nf + 1;
 		x++;
 	}
+	ret[y] = NULL;
 	sort_folders(ret, opt);
 	return (ret);
 }
-void		read_options(int ac, char **av, char *options)
+
+void	read_options(int ac, char **av, char *options)
 {
 	t_opt	opt;
 	t_info	*sinfo;
-	char		**folders;
+	char	**folders;
 
 	sinfo = (t_info*)malloc(sizeof(t_info));
 	opt = set_options_zero(opt, options);
@@ -103,13 +113,13 @@ void		read_options(int ac, char **av, char *options)
 	sort_command(sinfo, opt);
 }
 
-char			**specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
+char	**specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 {
-	int x;
-	struct stat stats;
-	char **folders;
-	int totalnf;
-	int nonf;
+	int			x;
+	struct stat	stats;
+	char		**folders;
+	int			totalnf;
+	int			nonf;
 
 	x = 1;
 	nonf = 0;
@@ -121,9 +131,9 @@ char			**specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 		printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
 		if (!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode)))
 		{
-				save_data2(sinfo, av[x], nonf, totalnf);
-				printf("out of save2\n\n");
-				nonf--;
+			save_data2(sinfo, av[x], nonf, totalnf);
+			printf("out of save2\n\n");
+			nonf--;
 		}
 		if (ac == 2)
 			end_specific_file(sinfo, opt, av);
@@ -133,16 +143,16 @@ char			**specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
 	return (folders);
 }
 
-void				end_specific_file(t_info *sinfo, t_opt opt, char **av)
+void	end_specific_file(t_info *sinfo, t_opt opt, char **av)
 {
 	print_errors(av);
 	if (sinfo->filename)
 		sort_command(sinfo, opt);
 }
 
-void				save_folders(char **f, t_opt opt)
+void	save_folders(char **f, t_opt opt)
 {
-	int x;
+	int		x;
 	t_info	*sinfo;
 
 	x = 0;
@@ -157,7 +167,8 @@ void				save_folders(char **f, t_opt opt)
 		x++;
 	}
 }
-void				save_data2(t_info *sinfo, char *filename, int nf, int tf)
+
+void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 {
 	printf("!![%d] [%d]!!", tf, nf);
 	if (nf < tf)
@@ -184,9 +195,7 @@ void				save_data2(t_info *sinfo, char *filename, int nf, int tf)
 		sinfo->next = NULL;
 }
 
-
-
-void		save_data1(t_info *sinfo, char *filename)
+void	save_data1(t_info *sinfo, char *filename)
 {
 	struct dirent	*read;
 	DIR				*p;
@@ -212,24 +221,24 @@ void		save_data1(t_info *sinfo, char *filename)
 	closedir(p);
 }
 
-char		*create_treename(char *read, char *filename)
+char	*create_treename(char *read, char *filename)
 {
 	char		*ret;
 
 	if (!(strcmp(filename, "./")))
-		return read;
+		return (read);
 	ret = (char*)malloc(sizeof(char) + strlen(read) + strlen(filename) + 2);
 	strcpy(ret, filename);
 	strcat(ret, "/");
 	strcat(ret, read);
-	return ret;
+	return (ret);
 }
 
 int		count_dir(char *filename)
 {
-	DIR *p;
-	struct dirent *read;
-	int i;
+	DIR				*p;
+	struct dirent	*read;
+	int				i;
 
 	i = 0;
 	p = opendir(filename);
@@ -252,9 +261,9 @@ int		valid_options(char o, char *cmp_options)
 			{
 				i++;
 				if (i == 5)
-					return 1;
+					return (1);
 			}
-			return 0;
+			return (0);
 		}
 		else
 		{
@@ -264,10 +273,10 @@ int		valid_options(char o, char *cmp_options)
 			exit(1);
 		}
 	}
-	return 0;
+	return (0);
 }
 
-void		verify_options(char **av, char *ret)
+void	verify_options(char **av, char *ret)
 {
 	int i;
 	int a_v;
@@ -293,7 +302,7 @@ void		verify_options(char **av, char *ret)
 	ret[i] = '\0';
 }
 
-void		ft_putnbr(int n)
+void	ft_putnbr(int n)
 {
 	if (n == -2147483648)
 	{
@@ -314,7 +323,7 @@ void		ft_putnbr(int n)
 		ft_putchar(n + 48);
 }
 
-void		ft_putchar(char c)
+void	ft_putchar(char c)
 {
 	write(1, &c, 1);
 }
