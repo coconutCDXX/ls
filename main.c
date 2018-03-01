@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/02/28 15:34:03 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/02/28 16:13:50 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	read_options(int ac, char **av, char *options)
 	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
 	if (check_av(av, ac))
 	{
-		folders = specific_fileread(ac, av, opt, sinfo);
+		folders = spec_file(ac, av, opt, sinfo);
 		if (folders != NULL)
 			save_folders(folders, opt);
 		exit(1);
@@ -113,7 +113,7 @@ void	read_options(int ac, char **av, char *options)
 	sort_command(sinfo, opt);
 }
 
-char	**specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo)
+char	**spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
 {
 	int			x;
 	struct stat	stats;

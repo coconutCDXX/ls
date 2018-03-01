@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ls_lib.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
+/*   Updated: 2018/02/28 16:16:04 by cwartell         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef LS_LIB_H
 # define LS_LIB_H
 
@@ -14,7 +26,11 @@
 # include <errno.h>
 # include <dirent.h>
 
-typedef enum		bools{FALSE, TRUE} boolean;
+typedef enum		bools
+{
+	FALSE,
+	TRUE
+}					boolean;
 
 typedef struct		s_opt
 {
@@ -23,23 +39,22 @@ typedef struct		s_opt
 	boolean		R;
 	boolean		r;
 	boolean		t;
-}				t_opt;
+}					t_opt;
 
 typedef struct		s_info
 {
-	int			dir_cont;
+	int				dir_cont;
 	char			*str_rights;
-	int			file_type;
+	int				file_type;
 	char			*user_name;
 	char			*grp_name;
-	int			bytes;
-	time_t		time_sort;
+	int				bytes;
+	time_t			time_sort;
 	char			*date;
 	char			*filename;
 	struct s_info	*next;
 	struct s_info	*tree;
-}				t_info;
-
+}					t_info;
 
 void				verify_options(char **av, char *ret);
 int					valid_options(char o, char *cmp_options);
@@ -57,17 +72,17 @@ void				set_data(t_info *sinfo, char *treename, char *name);
 void				set_time(t_info *sinfo, char *filename);
 void				set_types_name(t_info *sinfo, char *filename, char *dname);
 void				set_rights(t_info *sinfo, char *filename);
-void				set_rights_usr_grp(t_info *sinfo, struct stat);
-void				set_rights_oth(t_info *sinfo, struct stat);
+void				set_rights_usr_grp(t_info *sinfo, struct stat stats);
+void				set_rights_oth(t_info *sinfo, struct stat stats);
 void				set_uid_gid_size(t_info *sinfo, char *filename);
 int					count_dir(char *filename);
 void				ft_putnbr(int n);
 void				ft_putchar(char c);
 char				*create_treename(char *read, char *filename);
-t_opt				set_options(struct s_opt, char *options);
+t_opt				set_options_zero(t_opt struct_opt, char *options);
 int					check_alpha(char *a, char *b);
 int					check_alpha_bis(char x, char y);
-char				**specific_fileread(int ac, char **av, t_opt opt, t_info *sinfo);
+char				**spec_file(int ac, char **av, t_opt opt, t_info *sinfo);
 void				end_specific_file(t_info *sinfo, t_opt opt, char **av);
 int					check_av(char **av, int ac);
 char				**folders_av(int ac, char **av, int *nf, t_opt opt);
@@ -76,6 +91,5 @@ char				**sort_rev_folders(char **f);
 void				sort_time_folders(char **f);
 time_t				check_time(char *t);
 void				save_folders(char **f, t_opt opt);
-
 
 #endif
