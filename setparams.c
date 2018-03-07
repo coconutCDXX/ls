@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/02/28 15:27:57 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/07 03:17:19 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,17 @@ void	set_data(t_info *sinfo, char *treename, char *name)
 {
 	struct stat		stats;
 
-	set_types_name(sinfo, treename, name);
-	set_rights(sinfo, treename);
-	set_uid_gid_size(sinfo, treename);
-	set_time(sinfo, treename);
-	stat(name, &stats);
-	if (sinfo->str_rights[0] == 'd'
-	&& (strcmp(name, "..") != 0) && (strcmp(name, ".") != 0))
+	stat(treename, &stats);
+	set_types_name(sinfo, treename, name, stats);
+	if (sinfo->file_type == 6)
+	{
+		set_lstat(sinfo, treename, name);
+		return;
+	}
+	set_rights(sinfo, stats);
+	set_uid_gid_size(sinfo, stats);
+	set_time(sinfo, stats);
+	if (sinfo->str_rights[0] == 'd' && (strcmp(name, "..") != 0) && (strcmp(name, ".") != 0))
 	{
 		printf("tree mode\n");
 		sinfo->tree = (t_info*)malloc(sizeof(t_info));
@@ -33,63 +37,82 @@ void	set_data(t_info *sinfo, char *treename, char *name)
 		sinfo->tree = NULL;
 }
 
-void	set_time(t_info *sinfo, char *filename)
+void	set_lstat(t_info *sinfo, char *treename, char *name)
 {
-	struct stat	stats;
+	struct stat stats;
+
+	lstat(treename, &stats);
+	set_rights(sinfo, stats);
+	set_uid_gid_size(sinfo, stats);
+	set_time(sinfo, stats);
+	if (sinfo->str_rights[0] == 'd' && (strcmp(name, "..") != 0) && (strcmp(name, ".") != 0))
+	{
+		printf("tree mode\n");
+		sinfo->tree = (t_info*)malloc(sizeof(t_info));
+		printf("tree[%s]\n", treename);
+		save_data1(sinfo->tree, treename);
+	}
+	else
+		sinfo->tree = NULL;
+}
+
+void	set_time(t_info *sinfo, struct stat stats)
+{
 	int			l;
 
-	stat(filename, &stats);
 	l = strlen(ctime(&stats.st_mtime));
 	sinfo->date = (char*)malloc(sizeof(char) * l + 1);
 	strcpy(sinfo->date, ctime(&stats.st_mtime));
 	sinfo->time_sort = stats.st_mtime;
 }
 
-void	set_types_name(t_info *sinfo, char *filename, char *dname)
+void	set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stats)
 {
-	struct stat	stats;
 	int			l;
-	int			k;
+	char			*w;
 
 	l = strlen(dname);
+	if (lstat(filename, &stats) == 0 && S_ISLNK(stats.st_mode))
+	{
+		sinfo->file_type = 6;
+		w = (char*)malloc(sizeof(char) * (stats.st_size + l + 5));
+		readlink(filename, w, stats.st_size);
+		printf("[%s] [%ld] [%ld] pointee\n", w, stats.st_size , (long int)l + 5);
+		memmove(w + l + 4, w, stats.st_size);
+		printf("[%p] [%p]filename [%s][%lu]\n", w + l + 4, w, w, strlen(w));
+		w[l + 4 + stats.st_size] = '\0';
+		printf("null terminated filename [%s]\n", w);
+		strcpy(w, dname);
+		printf("w.o end filename [%s]\n", w);
+		w[l] = ' ';
+		w[l + 1] = '-';
+		w[l + 2] = '>';
+		w[l + 3] = ' ';
+		printf("final filename [%s][%lu]\n", w, strlen(w));
+		sinfo->linkedfile = (char*)malloc(sizeof(char) * strlen(w) + 1);
+		strcpy(sinfo->linkedfile, w);
+		sinfo->linkedfile[strlen(w)] = '\0';
+	}
+	sinfo->file_type = (sinfo->file_type == 6 ? 6 : 1);
 	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
 	strcpy(sinfo->filename, dname);
-	k = stat(filename, &stats);
-	if (S_ISBLK(stats.st_mode))
-		sinfo->file_type = 3;
-	if (S_ISCHR(stats.st_mode))
-		sinfo->file_type = 4;
-	if (S_ISDIR(stats.st_mode))
-		sinfo->file_type = 2;
-	if (S_ISFIFO(stats.st_mode))
-		sinfo->file_type = 5;
-	if (S_ISREG(stats.st_mode))
-		sinfo->file_type = 1;
-	if (S_ISLNK(stats.st_mode))
-		sinfo->file_type = 6;
-	printf("sinfo->file_type [%d] [%d]\n", sinfo->file_type, k);
-	if (k == -1)
-		perror("Error: ");
+	printf("sinfo->file_type [%s] [%s] [%d]\n", filename, sinfo->filename, sinfo->file_type);
 }
 
-void	set_rights(t_info *sinfo, char *filename)
+void	set_rights(t_info *sinfo, struct stat stats)
 {
-	struct stat stats;
-
-	stat(filename, &stats);
 	sinfo->str_rights = (char*)malloc(sizeof(char) * 11);
-	if (sinfo->file_type == 1)
-		sinfo->str_rights[0] = '-';
-	if (sinfo->file_type == 2)
-		sinfo->str_rights[0] = 'd';
-	if (sinfo->file_type == 3)
-		sinfo->str_rights[0] = 'b';
-	if (sinfo->file_type == 4)
-		sinfo->str_rights[0] = 'c';
-	if (sinfo->file_type == 5)
-		sinfo->str_rights[0] = 'f';
+	sinfo->str_rights[0] = '-';
 	if (sinfo->file_type == 6)
 		sinfo->str_rights[0] = 'l';
+	if (S_ISDIR(stats.st_mode))
+		sinfo->str_rights[0] = 'd';
+	if (S_ISBLK(stats.st_mode))
+		sinfo->str_rights[0] = 'b';
+	if (S_ISCHR(stats.st_mode))
+		sinfo->str_rights[0] = 'c';
+	if (S_ISFIFO(stats.st_mode))
+		sinfo->str_rights[0] = 'f';
 	set_rights_usr_grp(sinfo, stats);
 }
 
@@ -139,14 +162,12 @@ void	set_rights_oth(t_info *sinfo, struct stat stats)
 	sinfo->str_rights[10] = '\0';
 }
 
-void	set_uid_gid_size(t_info *sinfo, char *filename)
+void	set_uid_gid_size(t_info *sinfo, struct stat stats)
 {
-	struct stat		stats;
 	struct passwd	*person;
 	struct group	*grp;
 	int				l;
 
-	stat(filename, &stats);
 	person = getpwuid(stats.st_uid);
 	l = strlen(person->pw_name);
 	sinfo->user_name = (char*)malloc(sizeof(char) * l + 1);

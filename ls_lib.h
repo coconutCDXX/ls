@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/02/28 16:16:04 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/07 03:17:43 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct		s_info
 	time_t			time_sort;
 	char			*date;
 	char			*filename;
+	char			*linkedfile;
 	struct s_info	*next;
 	struct s_info	*tree;
 }					t_info;
@@ -69,12 +70,13 @@ void				sort_by_alpha(t_info **sinfo);
 void				save_data1(t_info *sinfo, char *filename);
 void				save_data2(t_info *sinfo, char *filename, int nf, int tf);
 void				set_data(t_info *sinfo, char *treename, char *name);
-void				set_time(t_info *sinfo, char *filename);
-void				set_types_name(t_info *sinfo, char *filename, char *dname);
-void				set_rights(t_info *sinfo, char *filename);
+void				set_lstat(t_info *sinfo, char *treename, char *name);
+void				set_time(t_info *sinfo, struct stat stats);
+void				set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stats);
+void				set_rights(t_info *sinfo, struct stat stats);
 void				set_rights_usr_grp(t_info *sinfo, struct stat stats);
 void				set_rights_oth(t_info *sinfo, struct stat stats);
-void				set_uid_gid_size(t_info *sinfo, char *filename);
+void				set_uid_gid_size(t_info *sinfo, struct stat stats);
 int					count_dir(char *filename);
 void				ft_putnbr(int n);
 void				ft_putchar(char c);

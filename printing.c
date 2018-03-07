@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/02/28 15:26:38 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/07 02:32:16 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,12 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 		l = strlen(sinfo->date);
 		write(1, sinfo->date, l);
 		ft_putchar(' ');
+		if (sinfo->file_type == 6)
+			write(1, sinfo->linkedfile, strlen(sinfo->linkedfile));
+		else
+			write(1, sinfo->filename, strlen(sinfo->filename));
+		ft_putchar('\n');
+		return;
 		//l = strlen(sinfo->filename);
 		//write(1, sinfo->filename, l);
 		//return;

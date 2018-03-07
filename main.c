@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/02/28 16:13:50 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/07 03:10:02 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,8 @@ void	save_folders(char **f, t_opt opt)
 
 void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 {
+	struct stat stats;
+
 	printf("!![%d] [%d]!!", tf, nf);
 	if (nf < tf)
 	{
@@ -184,12 +186,13 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
 		sinfo = sinfo->next;
 	}
+	stat(filename, &stats);
 	printf("YOU HAVE PASSSED\n");
-	set_types_name(sinfo, filename, filename);
-	set_rights(sinfo, filename);
-	set_uid_gid_size(sinfo, filename);
+	set_types_name(sinfo, filename, filename, stats);
+	set_rights(sinfo, stats);
+	set_uid_gid_size(sinfo, stats);
 	printf("what i crash on?\n");
-	set_time(sinfo, filename);
+	set_time(sinfo, stats);
 	sinfo->tree = NULL;
 	if (nf == 1)
 		sinfo->next = NULL;
