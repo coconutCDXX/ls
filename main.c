@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/07 03:10:02 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/09 04:25:31 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,7 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 	set_uid_gid_size(sinfo, stats);
 	printf("what i crash on?\n");
 	set_time(sinfo, stats);
+	sinfo->dir_cont = 1;
 	sinfo->tree = NULL;
 	if (nf == 1)
 		sinfo->next = NULL;
@@ -204,12 +205,11 @@ void	save_data1(t_info *sinfo, char *filename)
 	DIR				*p;
 	char			*treename;
 
-	printf("acknowledge commander---- save_data1\n\n");
-	sinfo->dir_cont = count_dir(filename);
+	sinfo->dir_cont = count_dir(filename, 'x');
 	p = opendir(filename);
-	printf("dir count is %d\n", sinfo->dir_cont);
 	while ((read = readdir(p)) != NULL)
 	{
+		sinfo->p_dir_cont = 1;
 		treename = create_treename(read->d_name, filename);
 		set_data(sinfo, treename, read->d_name);
 		if (sinfo->dir_cont > 1)
@@ -237,16 +237,27 @@ char	*create_treename(char *read, char *filename)
 	return (ret);
 }
 
-int		count_dir(char *filename)
+int		count_dir(char *filename, char a)
 {
-	DIR				*p;
+	DIR			*p;
 	struct dirent	*read;
-	int				i;
+	struct stat	stats;
+	int			i;
 
 	i = 0;
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
-		i++;
+	{
+		stat(read->d_name, &stats);
+		if (a == 'x' || S_ISDIR(stats.st_mode))
+		{
+			//printf("[%c]+1 its a dir [%s][%s]\n", a, filename, read->d_name);
+			i++;
+		}
+		//else
+		//	printf("[%c] nononononono [%s][%s]\n", a, filename, read->d_name);
+
+	}
 	closedir(p);
 	return (i);
 }

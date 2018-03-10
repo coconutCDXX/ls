@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/07 03:17:19 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/09 04:19:43 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ void	set_data(t_info *sinfo, char *treename, char *name)
 		return;
 	}
 	set_rights(sinfo, stats);
+	if (sinfo->str_rights[0] == 'd')
+		sinfo->p_dir_cont = count_dir(treename, sinfo->str_rights[0]);
 	set_uid_gid_size(sinfo, stats);
 	set_time(sinfo, stats);
 	if (sinfo->str_rights[0] == 'd' && (strcmp(name, "..") != 0) && (strcmp(name, ".") != 0))
@@ -43,6 +45,8 @@ void	set_lstat(t_info *sinfo, char *treename, char *name)
 
 	lstat(treename, &stats);
 	set_rights(sinfo, stats);
+	if (sinfo->str_rights[0] == 'd')
+		sinfo->p_dir_cont = count_dir(treename, sinfo->str_rights[0]);
 	set_uid_gid_size(sinfo, stats);
 	set_time(sinfo, stats);
 	if (sinfo->str_rights[0] == 'd' && (strcmp(name, "..") != 0) && (strcmp(name, ".") != 0))
@@ -96,7 +100,7 @@ void	set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stat
 	sinfo->file_type = (sinfo->file_type == 6 ? 6 : 1);
 	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
 	strcpy(sinfo->filename, dname);
-	printf("sinfo->file_type [%s] [%s] [%d]\n", filename, sinfo->filename, sinfo->file_type);
+	//printf("sinfo->file_type [%s] [%s] [%d]\n", filename, sinfo->filename, sinfo->file_type);
 }
 
 void	set_rights(t_info *sinfo, struct stat stats)
@@ -112,7 +116,9 @@ void	set_rights(t_info *sinfo, struct stat stats)
 	if (S_ISCHR(stats.st_mode))
 		sinfo->str_rights[0] = 'c';
 	if (S_ISFIFO(stats.st_mode))
-		sinfo->str_rights[0] = 'f';
+		sinfo->str_rights[0] = 'p';
+	if (S_ISSOCK(stats.st_mode))
+		sinfo->str_rights[0] = 's';
 	set_rights_usr_grp(sinfo, stats);
 }
 
@@ -168,6 +174,7 @@ void	set_uid_gid_size(t_info *sinfo, struct stat stats)
 	struct group	*grp;
 	int				l;
 
+	sinfo->block_cont = (int)stats.st_blocks;
 	person = getpwuid(stats.st_uid);
 	l = strlen(person->pw_name);
 	sinfo->user_name = (char*)malloc(sizeof(char) * l + 1);

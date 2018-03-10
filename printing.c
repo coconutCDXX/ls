@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/07 02:32:16 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/09 17:19:27 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ void		print_rec(t_info **sinfo, t_opt opt)
 	t_info *tmp;
 
 	tmp = *sinfo;
+	print_blocks(*sinfo, opt);
 	while (tmp)
 	{
 		if (opt.a == TRUE && (tmp->filename[0] == '.'))
@@ -41,6 +42,22 @@ void		print_rec(t_info **sinfo, t_opt opt)
 		tmp = tmp->next;
 	}
 }
+void		print_blocks(t_info *sinfo, t_opt opt)
+{
+	int block;
+
+	block = 0;
+	if (opt.l != TRUE)
+		return;
+	while (sinfo)
+	{
+		block += sinfo->block_cont;
+		sinfo = sinfo->next;
+	}
+	block = block / 2;
+	write(1, "total ", 6);
+	ft_putnbr(block);
+}
 
 void		write_it_all(t_info *sinfo, t_opt opt)
 {
@@ -48,12 +65,13 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 
 	if (opt.l == TRUE)
 	{
+		//write(1, &sinfo->block_cont, 2);
 		//write(1, "total ", 6);
 		//ft_putnbr(sinfo->dir_cont);
-		//write(1, "\n", 1);
+		write(1, "\n", 1);
 		write(1, sinfo->str_rights, 10);
 		ft_putchar(' ');
-		ft_putnbr(sinfo->file_type);
+		ft_putnbr(sinfo->p_dir_cont);
 		ft_putchar(' ');
 		l = strlen(sinfo->user_name);
 		write(1, sinfo->user_name, l);
