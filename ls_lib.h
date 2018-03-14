@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/09 17:15:08 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/13 23:57:54 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,10 @@ void				print_errors(char **av);
 void				sort_by_r(t_info **sinfo, t_opt opt);
 void				sort_by_time(t_info **sinfo, t_opt opt);
 void				sort_by_alpha(t_info **sinfo);
-void				save_data1(t_info *sinfo, char *filename);
+void				save_data1(t_info *sinfo, char *filename, boolean b);
 void				save_data2(t_info *sinfo, char *filename, int nf, int tf);
-void				set_data(t_info *sinfo, char *treename, char *name);
-void				set_lstat(t_info *sinfo, char *treename, char *name);
+void				set_data(t_info *sinfo, char *treename, char *name, boolean b);
+void				set_lstat(t_info *sinfo, char *treename, char *name, boolean b);
 void				set_time(t_info *sinfo, struct stat stats);
 void				set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stats);
 void				set_rights(t_info *sinfo, struct stat stats);

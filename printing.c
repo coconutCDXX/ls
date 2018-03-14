@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/09 17:19:27 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/14 03:29:09 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,8 @@ void		print_rec(t_info **sinfo, t_opt opt)
 	t_info *tmp;
 
 	tmp = *sinfo;
-	print_blocks(*sinfo, opt);
+	// if (tmp->next != NULL)
+		print_blocks(*sinfo, opt);
 	while (tmp)
 	{
 		if (opt.a == TRUE && (tmp->filename[0] == '.'))
@@ -54,7 +55,6 @@ void		print_blocks(t_info *sinfo, t_opt opt)
 		block += sinfo->block_cont;
 		sinfo = sinfo->next;
 	}
-	block = block / 2;
 	write(1, "total ", 6);
 	ft_putnbr(block);
 }
@@ -84,6 +84,7 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 		l = strlen(sinfo->date);
 		write(1, sinfo->date, l);
 		ft_putchar(' ');
+		printf("my file type is [%d]\n", sinfo->file_type);
 		if (sinfo->file_type == 6)
 			write(1, sinfo->linkedfile, strlen(sinfo->linkedfile));
 		else
@@ -109,7 +110,7 @@ void		print_errors(char **av)
 	x = 1;
 	while (av[x])
 	{
-		if (stat(av[x], &stats) && av[x][0] != '-')
+		if (stat(av[x], &stats) && av[x][0] != '-' && lstat(av[x], &stats))
 		{
 			write(1, "ls: cannot access '", 19);
 			l = strlen(av[x]);

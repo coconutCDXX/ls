@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/09 04:25:31 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/14 03:24:53 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,13 @@ char	**folders_av(int ac, char **av, int *nf, t_opt opt)
 			printf("folders array ret[%s]\n", ret[y]);
 			y++;
 		}
-		else if (!(stat(av[x], &stats)) && (!(S_ISDIR(stats.st_mode))))
+		else if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode))) || !(lstat(av[x], &stats)))
 			*nf = *nf + 1;
 		x++;
 	}
 	ret[y] = NULL;
-	sort_folders(ret, opt);
+	if (ret[0] != NULL)
+		sort_folders(ret, opt);
 	return (ret);
 }
 
@@ -108,7 +109,7 @@ void	read_options(int ac, char **av, char *options)
 			save_folders(folders, opt);
 		exit(1);
 	}
-	save_data1(sinfo, "./");
+	save_data1(sinfo, "./", opt.R);
 	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
 	sort_command(sinfo, opt);
 }
@@ -129,7 +130,7 @@ char	**spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
 	while (ac > 1)
 	{
 		printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
-		if (!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode)))
+		if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode))) || !(lstat(av[x], &stats)))
 		{
 			save_data2(sinfo, av[x], nonf, totalnf);
 			printf("out of save2\n\n");
@@ -159,7 +160,7 @@ void	save_folders(char **f, t_opt opt)
 	while (f[x])
 	{
 		sinfo = (t_info*)malloc(sizeof(t_info));
-		save_data1(sinfo, f[x]);
+		save_data1(sinfo, f[x], opt.R);
 		printf("SAVE FOLDERS REVIEW [%s] [%s]\n", sinfo->filename, f[x]);
 		sort_command(sinfo, opt);
 		free(sinfo);
@@ -186,6 +187,16 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
 		sinfo = sinfo->next;
 	}
+	if (lstat(filename, &stats) == 0 && (S_ISLNK(stats.st_mode)))
+	{
+		set_types_name(sinfo, filename, filename, stats);
+		set_lstat(sinfo, filename, filename, 0);
+		sinfo->p_dir_cont = 1;
+		if (nf == 1)
+			sinfo->next = NULL;
+		sinfo->tree = NULL;
+		return;
+	}
 	stat(filename, &stats);
 	printf("YOU HAVE PASSSED\n");
 	set_types_name(sinfo, filename, filename, stats);
@@ -194,12 +205,16 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 	printf("what i crash on?\n");
 	set_time(sinfo, stats);
 	sinfo->dir_cont = 1;
+	sinfo->p_dir_cont = 1;
 	sinfo->tree = NULL;
 	if (nf == 1)
+	{
 		sinfo->next = NULL;
+		printf("i nulled\n");
+	}
 }
 
-void	save_data1(t_info *sinfo, char *filename)
+void	save_data1(t_info *sinfo, char *filename, boolean b)
 {
 	struct dirent	*read;
 	DIR				*p;
@@ -209,9 +224,10 @@ void	save_data1(t_info *sinfo, char *filename)
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
+		//printf("life!! [%s]\n", read->d_name);
 		sinfo->p_dir_cont = 1;
 		treename = create_treename(read->d_name, filename);
-		set_data(sinfo, treename, read->d_name);
+		set_data(sinfo, treename, read->d_name, b);
 		if (sinfo->dir_cont > 1)
 		{
 			sinfo->next = (t_info*)malloc(sizeof(t_info));
@@ -243,16 +259,23 @@ int		count_dir(char *filename, char a)
 	struct dirent	*read;
 	struct stat	stats;
 	int			i;
+	char			*treename;
 
 	i = 0;
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
-		stat(read->d_name, &stats);
+		treename = create_treename(read->d_name, filename);
+		stat(treename, &stats);
 		if (a == 'x' || S_ISDIR(stats.st_mode))
 		{
-			//printf("[%c]+1 its a dir [%s][%s]\n", a, filename, read->d_name);
+			//printf("[%c][%d]+1 its a dir [%s][%s]\n",a , i, filename, read->d_name);
 			i++;
+			if (lstat(treename, &stats) == 0 && S_ISLNK(stats.st_mode))
+			{
+				//printf("found a link\n");
+				i -= 1;
+			}
 		}
 		//else
 		//	printf("[%c] nononononono [%s][%s]\n", a, filename, read->d_name);

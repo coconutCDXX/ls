@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/02/28 15:35:07 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/14 03:38:46 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ void	sort_by_alpha(t_info **sinfo)
 	current = *sinfo;
 	while (current->next)
 	{
+		//printf("secondary check [%s] [%s]\n", current->filename, current->next->filename);
 		if (check_alpha(current->filename, current->next->filename))
 		{
 			tmp = current->next;
@@ -90,7 +91,11 @@ void	sort_by_alpha(t_info **sinfo)
 			current = current->next;
 		}
 		if (current->tree != NULL)
+		{
+			//printf("dangerzone\n");
 			sort_by_alpha(&(current->tree));
+		}
+		//printf("third\n");
 	}
 }
 
