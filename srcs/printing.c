@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/14 19:29:52 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/15 05:45:13 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void		print_rec(t_info **sinfo, t_opt opt)
 
 	tmp = *sinfo;
 	// if (tmp->next != NULL)
-		print_blocks(*sinfo, opt);
+	print_blocks(*sinfo, opt);
 	while (tmp)
 	{
 		if (opt.a == TRUE && (tmp->filename[0] == '.'))

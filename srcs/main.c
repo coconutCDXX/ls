@@ -6,11 +6,11 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/14 19:19:27 by coralie          ###   ########.fr       */
+/*   Updated: 2018/03/15 05:53:43 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ls_lib.h"
+#include <ls_lib.h>
 
 int		main(int ac, char **av)
 {
@@ -22,27 +22,29 @@ int		main(int ac, char **av)
 	return (0);
 }
 
-t_opt	set_options_zero(t_opt struct_opt, char *options)
+t_opt	set_options_zero(char *options)
 {
-	struct_opt.a = FALSE;
-	struct_opt.l = FALSE;
-	struct_opt.R = FALSE;
-	struct_opt.r = FALSE;
-	struct_opt.t = FALSE;
+	t_opt opt;
+
+	opt.a = FALSE;
+	opt.l = FALSE;
+	opt.R = FALSE;
+	opt.r = FALSE;
+	opt.t = FALSE;
 	if (options != NULL)
 	{
 		if (strchr(options, 'a'))
-			struct_opt.a = TRUE;
+			opt.a = TRUE;
 		if (strchr(options, 'l'))
-			struct_opt.l = TRUE;
+			opt.l = TRUE;
 		if (strchr(options, 'R'))
-			struct_opt.R = TRUE;
+			opt.R = TRUE;
 		if (strchr(options, 'r'))
-			struct_opt.r = TRUE;
+			opt.r = TRUE;
 		if (strchr(options, 't'))
-			struct_opt.t = TRUE;
+			opt.t = TRUE;
 	}
-	return (struct_opt);
+	return (opt);
 }
 
 int		check_av(char **av, int ac)
@@ -99,7 +101,7 @@ void	read_options(int ac, char **av, char *options)
 	char	**folders;
 
 	sinfo = (t_info*)malloc(sizeof(t_info));
-	opt = set_options_zero(opt, options);
+	opt = set_options_zero(options);
 	// printf("cechk alive\n");
 	// printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
 	if (check_av(av, ac))
@@ -129,11 +131,12 @@ char	**spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
 	//printf("death--------------------[%d]\n", nonf);
 	while (ac > 1)
 	{
-		//printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
-		if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode))) || !(lstat(av[x], &stats)))
+		printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
+		if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode)))
+		|| (!(lstat(av[x], &stats)) && !(S_ISDIR(stats.st_mode))))
 		{
 			save_data2(sinfo, av[x], nonf, totalnf);
-		//	printf("out of save2\n\n");
+			printf("out of save2\n\n");
 			nonf--;
 		}
 		if (ac == 2)
@@ -173,7 +176,7 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 {
 	struct stat stats;
 
-	//printf("!![%d] [%d]!!", tf, nf);
+	printf("!![%d] [%d]!!", tf, nf);
 	if (nf < tf)
 	{
 		//printf("YOU SHALL NOT PASS\n");
@@ -224,7 +227,7 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
-		//printf("life!! [%s]\n", read->d_name);
+		printf("life!! [%s]\n", read->d_name);
 		sinfo->p_dir_cont = 1;
 		treename = create_treename(read->d_name, filename);
 		set_data(sinfo, treename, read->d_name, b);
@@ -339,28 +342,28 @@ void	verify_options(char **av, char *ret)
 	ret[i] = '\0';
 }
 
-void	ft_putnbr(int n)
-{
-	if (n == -2147483648)
-	{
-		//putstr("-2147483648");
-		return ;
-	}
-	if (n < 0)
-	{
-		ft_putchar('-');
-		n = n * (-1);
-	}
-	if (n >= 10)
-	{
-		ft_putnbr(n / 10);
-		ft_putnbr(n % 10);
-	}
-	else
-		ft_putchar(n + 48);
-}
-
-void	ft_putchar(char c)
-{
-	write(1, &c, 1);
-}
+// void	ft_putnbr(int n)
+// {
+// 	if (n == -2147483648)
+// 	{
+// 		//putstr("-2147483648");
+// 		return ;
+// 	}
+// 	if (n < 0)
+// 	{
+// 		ft_putchar('-');
+// 		n = n * (-1);
+// 	}
+// 	if (n >= 10)
+// 	{
+// 		ft_putnbr(n / 10);
+// 		ft_putnbr(n % 10);
+// 	}
+// 	else
+// 		ft_putchar(n + 48);
+// }
+//
+// void	ft_putchar(char c)
+// {
+// 	write(1, &c, 1);
+// }
