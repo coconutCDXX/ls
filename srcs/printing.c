@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/14 03:29:09 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/14 19:29:52 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ void		print_rec(t_info **sinfo, t_opt opt)
 			write_it_all(tmp, opt);
 		tmp = tmp->next;
 	}
-	printf("exit loop\n");
+	//printf("exit loop\n");
 	tmp = *sinfo;
 	while (tmp && opt.R == TRUE)
 	{
 		if (tmp->tree != NULL)
 		{
-			printf("i found a LITTLE TREE! [%s]\n", tmp->tree->filename);
+			//printf("i found a LITTLE TREE! [%s]\n", tmp->tree->filename);
 			print_rec(&(tmp->tree), opt);
 		}
 		tmp = tmp->next;
@@ -84,7 +84,7 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 		l = strlen(sinfo->date);
 		write(1, sinfo->date, l);
 		ft_putchar(' ');
-		printf("my file type is [%d]\n", sinfo->file_type);
+		//printf("my file type is [%d]\n", sinfo->file_type);
 		if (sinfo->file_type == 6)
 			write(1, sinfo->linkedfile, strlen(sinfo->linkedfile));
 		else
@@ -97,8 +97,9 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 	}
 	l = strlen(sinfo->filename);
 	write(1, sinfo->filename, l);
+	write(1, "\t", 1);
 	//printf("\nwhats sinfo? [%s]", sinfo->filename);
-	printf("\n--end write [%d]\n\n\n", l);
+//	printf("\n--end write [%d]\n\n\n", l);
 }
 
 void		print_errors(char **av)

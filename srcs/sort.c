@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/14 03:38:46 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/14 19:28:39 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,19 @@
 
 void	sort_command(t_info *sinfo, t_opt opt)
 {
-	printf("enterring command control sort over over\n");
+	//printf("enterring command control sort over over\n");
 	sort_by_alpha(&sinfo);
-	printf("i sorted by alpha!!!!!!!\n");
+//	printf("i sorted by alpha!!!!!!!\n");
 	if (opt.t == TRUE)
 	{
 		sort_by_time(&sinfo, opt);
-		printf("i sorted by t\n");
+		//printf("i sorted by t\n");
 	}
 	if (opt.r == TRUE)
 		sort_by_r(&sinfo, opt);
-	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
+//	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 	print_rec(&sinfo, opt);
-	printf("print all done return\n");
+//	printf("print all done return\n");
 }
 
 void	sort_by_r(t_info **sinfo, t_opt opt)

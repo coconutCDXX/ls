@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/14 03:24:53 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/03/14 19:19:27 by coralie          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int		main(int ac, char **av)
 	char	options[6];
 
 	verify_options(av, options);
-	printf("options are [%s]\n", options);
+	//printf("options are [%s]\n", options);
 	read_options(ac, av, options);
 	return (0);
 }
@@ -54,11 +54,11 @@ int		check_av(char **av, int ac)
 	{
 		if (av[x][0] != '-')
 			return (1);
-		printf("[%d][%d]\n", x, ac);
+	//	printf("[%d][%d]\n", x, ac);
 		x++;
 		ac--;
 	}
-	printf("i ret 0\n\n");
+//	printf("i ret 0\n\n");
 	return (0);
 }
 
@@ -74,12 +74,12 @@ char	**folders_av(int ac, char **av, int *nf, t_opt opt)
 	ret = (char**)malloc(sizeof(char*) * ac);
 	while (av[x])
 	{
-		printf("av[x] [%s]\n", av[x]);
+	//	printf("av[x] [%s]\n", av[x]);
 		if (!(stat(av[x], &stats)) && (S_ISDIR(stats.st_mode)))
 		{
 			ret[y] = (char*)malloc(sizeof(char) * strlen(av[x]) + 1);
 			strcpy(ret[y], av[x]);
-			printf("folders array ret[%s]\n", ret[y]);
+			//printf("folders array ret[%s]\n", ret[y]);
 			y++;
 		}
 		else if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode))) || !(lstat(av[x], &stats)))
@@ -100,8 +100,8 @@ void	read_options(int ac, char **av, char *options)
 
 	sinfo = (t_info*)malloc(sizeof(t_info));
 	opt = set_options_zero(opt, options);
-	printf("cechk alive\n");
-	printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
+	// printf("cechk alive\n");
+	// printf("opt struct contains a[%d] l[%d] R[%d] r[%d] t[%d]\n", opt.a, opt.l, opt.R, opt.r, opt.t);
 	if (check_av(av, ac))
 	{
 		folders = spec_file(ac, av, opt, sinfo);
@@ -110,7 +110,7 @@ void	read_options(int ac, char **av, char *options)
 		exit(1);
 	}
 	save_data1(sinfo, "./", opt.R);
-	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
+//	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
 	sort_command(sinfo, opt);
 }
 
@@ -126,14 +126,14 @@ char	**spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
 	nonf = 0;
 	folders = folders_av(ac, av, &nonf, opt);
 	totalnf = nonf;
-	printf("death--------------------[%d]\n", nonf);
+	//printf("death--------------------[%d]\n", nonf);
 	while (ac > 1)
 	{
-		printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
+		//printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
 		if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode))) || !(lstat(av[x], &stats)))
 		{
 			save_data2(sinfo, av[x], nonf, totalnf);
-			printf("out of save2\n\n");
+		//	printf("out of save2\n\n");
 			nonf--;
 		}
 		if (ac == 2)
@@ -161,7 +161,7 @@ void	save_folders(char **f, t_opt opt)
 	{
 		sinfo = (t_info*)malloc(sizeof(t_info));
 		save_data1(sinfo, f[x], opt.R);
-		printf("SAVE FOLDERS REVIEW [%s] [%s]\n", sinfo->filename, f[x]);
+		//printf("SAVE FOLDERS REVIEW [%s] [%s]\n", sinfo->filename, f[x]);
 		sort_command(sinfo, opt);
 		free(sinfo);
 		sinfo = NULL;
@@ -173,17 +173,17 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 {
 	struct stat stats;
 
-	printf("!![%d] [%d]!!", tf, nf);
+	//printf("!![%d] [%d]!!", tf, nf);
 	if (nf < tf)
 	{
-		printf("YOU SHALL NOT PASS\n");
+		//printf("YOU SHALL NOT PASS\n");
 		while (nf < tf - 1)
 		{
-			printf("where we at trannies [%s] [%d]\n", sinfo->filename, tf);
+		//	printf("where we at trannies [%s] [%d]\n", sinfo->filename, tf);
 			sinfo = sinfo->next;
 			tf--;
 		}
-		printf("where we at lovelies [%s] [%d]\n", sinfo->filename, tf);
+	//	printf("where we at lovelies [%s] [%d]\n", sinfo->filename, tf);
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
 		sinfo = sinfo->next;
 	}
@@ -198,11 +198,11 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 		return;
 	}
 	stat(filename, &stats);
-	printf("YOU HAVE PASSSED\n");
+	//printf("YOU HAVE PASSSED\n");
 	set_types_name(sinfo, filename, filename, stats);
 	set_rights(sinfo, stats);
 	set_uid_gid_size(sinfo, stats);
-	printf("what i crash on?\n");
+//	printf("what i crash on?\n");
 	set_time(sinfo, stats);
 	sinfo->dir_cont = 1;
 	sinfo->p_dir_cont = 1;
@@ -210,7 +210,7 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 	if (nf == 1)
 	{
 		sinfo->next = NULL;
-		printf("i nulled\n");
+		//printf("i nulled\n");
 	}
 }
 
