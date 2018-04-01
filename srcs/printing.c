@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/15 05:45:13 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/01 01:04:53 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,4 +120,12 @@ void		print_errors(char **av)
 		}
 		x++;
 	}
+}
+
+void	print_error_perm(char *filename)
+{
+	write(1, "ls: ", 4);
+	write(1, filename, strlen(filename));
+	write(1, ": Permission denied", 19);
+	write(1, "\n", 1);
 }

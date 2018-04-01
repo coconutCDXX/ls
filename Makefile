@@ -5,8 +5,8 @@ NAME = ft_ls
 # Project builds and dirs
 SRCDIR = ./srcs/
 SRCNAMES = $(shell ls $(SRCDIR) | grep -E ".+\.c")
-SRC = $(addprefix $(SRCDIR), $(SRCNAMES))
-INC = ./inc/
+#SRC = $(addprefix $(SRCDIR), $(SRCNAMES))
+INC = ./includes/
 BUILDDIR = ./build/
 BUILDOBJS = $(addprefix $(BUILDDIR), $(SRCNAMES:.c=.o))
 

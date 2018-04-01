@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/15 05:53:43 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/01 02:59:35 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int		main(int ac, char **av)
 
 	verify_options(av, options);
 	//printf("options are [%s]\n", options);
-	read_options(ac, av, options);
+	save_command(ac, av, options);
 	return (0);
 }
 
@@ -76,7 +76,7 @@ char	**folders_av(int ac, char **av, int *nf, t_opt opt)
 	ret = (char**)malloc(sizeof(char*) * ac);
 	while (av[x])
 	{
-	//	printf("av[x] [%s]\n", av[x]);
+		//printf("av[x] [%s]\n", av[x]);
 		if (!(stat(av[x], &stats)) && (S_ISDIR(stats.st_mode)))
 		{
 			ret[y] = (char*)malloc(sizeof(char) * strlen(av[x]) + 1);
@@ -94,7 +94,7 @@ char	**folders_av(int ac, char **av, int *nf, t_opt opt)
 	return (ret);
 }
 
-void	read_options(int ac, char **av, char *options)
+void	save_command(int ac, char **av, char *options)
 {
 	t_opt	opt;
 	t_info	*sinfo;
@@ -109,11 +109,14 @@ void	read_options(int ac, char **av, char *options)
 		folders = spec_file(ac, av, opt, sinfo);
 		if (folders != NULL)
 			save_folders(folders, opt);
+			free(folders);
 		exit(1);
 	}
 	save_data1(sinfo, "./", opt.R);
 //	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
-	sort_command(sinfo, opt);
+	if (sinfo->filename)
+		sort_command(sinfo, opt);
+	delete_me(sinfo);
 }
 
 char	**spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
@@ -131,12 +134,12 @@ char	**spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
 	//printf("death--------------------[%d]\n", nonf);
 	while (ac > 1)
 	{
-		printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
+		//printf("pass b4 alive [%d][%s][%d]\n", ac, av[x], nonf);
 		if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode)))
 		|| (!(lstat(av[x], &stats)) && !(S_ISDIR(stats.st_mode))))
 		{
 			save_data2(sinfo, av[x], nonf, totalnf);
-			printf("out of save2\n\n");
+			//printf("out of save2\n\n");
 			nonf--;
 		}
 		if (ac == 2)
@@ -151,7 +154,10 @@ void	end_specific_file(t_info *sinfo, t_opt opt, char **av)
 {
 	print_errors(av);
 	if (sinfo->filename)
+	{
 		sort_command(sinfo, opt);
+		delete_me(sinfo);
+	}
 }
 
 void	save_folders(char **f, t_opt opt)
@@ -165,18 +171,23 @@ void	save_folders(char **f, t_opt opt)
 		sinfo = (t_info*)malloc(sizeof(t_info));
 		save_data1(sinfo, f[x], opt.R);
 		//printf("SAVE FOLDERS REVIEW [%s] [%s]\n", sinfo->filename, f[x]);
-		sort_command(sinfo, opt);
-		free(sinfo);
+		if (sinfo->filename)
+		{
+			sort_command(sinfo, opt);
+			delete_me(sinfo);
+		}
 		sinfo = NULL;
+		free(f[x]);
 		x++;
 	}
+	free(f);
 }
 
 void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 {
 	struct stat stats;
 
-	printf("!![%d] [%d]!!", tf, nf);
+	//printf("!![%d] [%d]!!", tf, nf);
 	if (nf < tf)
 	{
 		//printf("YOU SHALL NOT PASS\n");
@@ -224,10 +235,15 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 	char			*treename;
 
 	sinfo->dir_cont = count_dir(filename, 'x');
+	if (sinfo->dir_cont == 0)
+	{
+		print_error_perm(filename);
+		return ;
+	}
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
-		printf("life!! [%s]\n", read->d_name);
+		//printf("life!! [%s]\n", read->d_name);
 		sinfo->p_dir_cont = 1;
 		treename = create_treename(read->d_name, filename);
 		set_data(sinfo, treename, read->d_name, b);
@@ -239,6 +255,7 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 		}
 		else
 			sinfo->next = NULL;
+		free(treename);
 	}
 	closedir(p);
 }
@@ -266,6 +283,8 @@ int		count_dir(char *filename, char a)
 
 	i = 0;
 	p = opendir(filename);
+	if (p == NULL)
+		return (0);
 	while ((read = readdir(p)) != NULL)
 	{
 		treename = create_treename(read->d_name, filename);
@@ -282,7 +301,8 @@ int		count_dir(char *filename, char a)
 		}
 		//else
 		//	printf("[%c] nononononono [%s][%s]\n", a, filename, read->d_name);
-
+		if (treename)
+			free(treename);
 	}
 	closedir(p);
 	return (i);

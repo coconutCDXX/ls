@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/15 05:45:18 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/01 01:29:37 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void	set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stat
 		sinfo->linkedfile = (char*)malloc(sizeof(char) * strlen(w) + 1);
 		strcpy(sinfo->linkedfile, w);
 		sinfo->linkedfile[strlen(w)] = '\0';
+		free(w);
 	}
 	sinfo->file_type = (sinfo->file_type == 6 ? 6 : 1);
 	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);

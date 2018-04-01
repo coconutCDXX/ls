@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/03/15 04:59:07 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/01 01:21:57 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,12 +64,13 @@ typedef struct		s_info
 
 void				verify_options(char **av, char *ret);
 int					valid_options(char o, char *cmp_options);
-void				read_options(int ac, char **av, char *options);
+void				save_command(int ac, char **av, char *options);
 void				sort_command(t_info *sinfo, t_opt opt);
 void				print_rec(t_info **sinfo, t_opt opt);
 void				print_blocks(t_info *sinfo, t_opt opt);
 void				write_it_all(t_info *sinfo, t_opt opt);
 void				print_errors(char **av);
+void				print_error_perm(char *filename);
 void				sort_by_r(t_info **sinfo, t_opt opt);
 void				sort_by_time(t_info **sinfo, t_opt opt);
 void				sort_by_alpha(t_info **sinfo);
@@ -84,6 +85,7 @@ void				set_rights_usr_grp(t_info *sinfo, struct stat stats);
 void				set_rights_oth(t_info *sinfo, struct stat stats);
 void				set_uid_gid_size(t_info *sinfo, struct stat stats);
 int					count_dir(char *filename, char a);
+void				delete_me(t_info *sinfo);
 //void				ft_putnbr(int n);
 //void				ft_putchar(char c);
 char				*create_treename(char *read, char *filename);
