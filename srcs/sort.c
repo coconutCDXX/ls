@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/01 03:24:06 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/02 21:29:19 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,39 +26,10 @@ void	sort_command(t_info *sinfo, t_opt opt)
 		sort_by_r(&sinfo, opt);
 //	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 	print_rec(&sinfo, opt);
-	delete_me(sinfo);
+	//delete_me(sinfo);
 //	printf("print all done return\n");
 }
-void	delete_me(t_info *sinfo)
-{
-	t_info *next;
 
-	while (sinfo)
-	{
-		printf("f[%s]\n", sinfo->filename);
-		if (sinfo->str_rights)
-			free(sinfo->str_rights);
-		if (sinfo->user_name)
-			free(sinfo->user_name);
-		if (sinfo->grp_name)
-			free(sinfo->grp_name);
-		if (sinfo->date)
-			free(sinfo->date);
-		if (sinfo->filename)
-			free(sinfo->filename);
-		if (sinfo->linkedfile)
-			free(sinfo->linkedfile);
-		if (sinfo->tree)
-		{
-			delete_me(sinfo->tree);
-			free(sinfo->tree);
-		}
-		next = sinfo->next;
-		//free(sinfo->next);
-		free(sinfo);
-		sinfo = next;
-	}
-}
 void	sort_by_r(t_info **sinfo, t_opt opt)
 {
 	t_info *newstart;
@@ -245,30 +216,41 @@ void	sort_folders(char **f, t_opt opt)
 	if (opt.t)
 		sort_time_folders(f);
 	if (opt.r)
-		f = sort_rev_folders(f);
+		sort_rev_folders(f);
 }
 
-char	**sort_rev_folders(char **f)
+void	sort_rev_folders(char **f)
 {
 	int		y;
-	int		x;
 	int		z;
-	char	**new;
+	char	*save;
 
+	z = 0;
 	y = 0;
-	x = 0;
-	while (f[y])
-		y++;
-	y--;
-	new = (char**)malloc(sizeof(char*) * y);
-	while (y - x >= 0)
+	while (f[z])
+			z++;
+	z--;
+	while (y < z - y)
 	{
-		z = strlen(f[y - x]);
-		new[x] = (char*)malloc(sizeof(char) * z + 1);
-		strcpy(new[x], f[y - x]);
-		x++;
+		save = f[y];
+		f[y] = f[z - y];
+		f[z - y] = save;
+		y++;
 	}
-	return (new);
+	// y = 0;
+	// x = 0;
+	// while (f[y])
+	// 	y++;
+	// y--;
+	// new = (char**)malloc(sizeof(char*) * y);
+	// while (y - x >= 0)
+	// {
+	// 	z = strlen(f[y - x]);
+	// 	new[x] = (char*)malloc(sizeof(char) * z + 1);
+	// 	strcpy(new[x], f[y - x]);
+	// 	x++;
+	// }
+	// return (new);
 }
 
 time_t	check_time(char *t)

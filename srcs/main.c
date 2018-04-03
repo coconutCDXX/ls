@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/01 02:59:35 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/02 21:49:40 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,16 +107,18 @@ void	save_command(int ac, char **av, char *options)
 	if (check_av(av, ac))
 	{
 		folders = spec_file(ac, av, opt, sinfo);
-		if (folders != NULL)
+		if (folders[0] != NULL)
+		{
 			save_folders(folders, opt);
-			free(folders);
+			//delete_array(folders);
+		}
 		exit(1);
 	}
 	save_data1(sinfo, "./", opt.R);
 //	printf(" {READ_OPTIONS s_c next} save data is done check for sinfo [%s]\n", sinfo->filename);
 	if (sinfo->filename)
 		sort_command(sinfo, opt);
-	delete_me(sinfo);
+	//delete_me(sinfo);
 }
 
 char	**spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
@@ -156,7 +158,7 @@ void	end_specific_file(t_info *sinfo, t_opt opt, char **av)
 	if (sinfo->filename)
 	{
 		sort_command(sinfo, opt);
-		delete_me(sinfo);
+		//delete_me(sinfo);
 	}
 }
 
@@ -174,13 +176,11 @@ void	save_folders(char **f, t_opt opt)
 		if (sinfo->filename)
 		{
 			sort_command(sinfo, opt);
-			delete_me(sinfo);
+			//delete_me(sinfo);
 		}
 		sinfo = NULL;
-		free(f[x]);
 		x++;
 	}
-	free(f);
 }
 
 void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
@@ -255,7 +255,8 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 		}
 		else
 			sinfo->next = NULL;
-		free(treename);
+		// if (treename != read->d_name)
+		// 	free(treename);
 	}
 	closedir(p);
 }
@@ -301,8 +302,8 @@ int		count_dir(char *filename, char a)
 		}
 		//else
 		//	printf("[%c] nononononono [%s][%s]\n", a, filename, read->d_name);
-		if (treename)
-			free(treename);
+		// if (treename != read->d_name)
+		// 	free(treename);
 	}
 	closedir(p);
 	return (i);

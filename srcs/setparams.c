@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/01 01:29:37 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/02 22:43:26 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,17 +75,27 @@ void	set_time(t_info *sinfo, struct stat stats)
 void	set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stats)
 {
 	int			l;
+	int			k;
+	long long int ls;
 	char			*w;
+	char			*rl;
 
 	l = strlen(dname);
+	sinfo->file_type = 1;
+	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
+	strcpy(sinfo->filename, dname);
 	if (lstat(filename, &stats) == 0 && S_ISLNK(stats.st_mode))
 	{
 		sinfo->file_type = 6;
+		rl = (char*)malloc(sizeof(char) * 100);
 		//printf("this is a link [%s]\n", dname);
-		w = (char*)malloc(sizeof(char) * (stats.st_size + l + 5));
-		readlink(filename, w, stats.st_size);
+		ls = readlink(filename, rl, 100);
+		k = strlen(rl);
+		w = (char*)malloc(sizeof(char) * (k + l + 5));
+		printf("stats.st_size [%d](%lld)[%lld] {%s}{%s}\n", k, ls, stats.st_size, filename, rl);
+
 		//printf("[%s] [%lld] [%ld] pointee\n", w, stats.st_size , (long int)l + 5);
-		memmove(w + l + 4, w, stats.st_size);
+		//memmove(w + l + 4, w, stats.st_size);
 		//printf("[%p] [%p]filename [%s][%lu]\n", w + l + 4, w, w, strlen(w));
 		w[l + 4 + stats.st_size] = '\0';
 		//printf("null terminated filename [%s]\n", w);
@@ -95,15 +105,14 @@ void	set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stat
 		w[l + 1] = '-';
 		w[l + 2] = '>';
 		w[l + 3] = ' ';
+		strncat(w, rl, k);
 		//printf("final filename [%s][%lu]\n", w, strlen(w));
 		sinfo->linkedfile = (char*)malloc(sizeof(char) * strlen(w) + 1);
 		strcpy(sinfo->linkedfile, w);
 		sinfo->linkedfile[strlen(w)] = '\0';
 		free(w);
+		free(rl);
 	}
-	sinfo->file_type = (sinfo->file_type == 6 ? 6 : 1);
-	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->filename, dname);
 	//printf("sinfo->file_type [%s] [%s] [%d]\n", filename, sinfo->filename, sinfo->file_type);
 }
 
