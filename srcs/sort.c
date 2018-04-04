@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/02 21:29:19 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/04 00:33:12 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,10 @@ void	sort_command(t_info *sinfo, t_opt opt)
 	}
 	if (opt.r == TRUE)
 		sort_by_r(&sinfo, opt);
-//	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 	print_rec(&sinfo, opt);
-	//delete_me(sinfo);
+
+	delete_me(sinfo);
+//	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
 //	printf("print all done return\n");
 }
 
@@ -74,7 +75,7 @@ void	sort_by_alpha(t_info **sinfo)
 	current = *sinfo;
 	while (current->next)
 	{
-		//printf("secondary check [%s] [%s]\n", current->filename, current->next->filename);
+		//printf("1. 2. [%s] [%s]\n", current->filename, current->next->filename);
 		if (check_alpha(current->filename, current->next->filename))
 		{
 			tmp = current->next;
@@ -130,7 +131,7 @@ int		check_alpha(char *a, char *b)
 
 	j = 0;
 	i = 0;
-	if (!(strcmp(b, "..")) && !(strcmp(a, ".")))
+	if (!(ft_strcmp(b, "..")) && !(ft_strcmp(a, ".")))
 		return (0);
 	if (a[j] == '.')
 		j++;

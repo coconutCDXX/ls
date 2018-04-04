@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 19:36:27 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/02 21:24:03 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/03 22:49:07 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,18 @@ void	delete_me(t_info *sinfo)
 	{
 		//printf("f[%s]\n", sinfo->filename);
 		if (sinfo->str_rights)
+		{
 			free(sinfo->str_rights);
+			sinfo->str_rights = NULL;
+			//printf("[%s]\n", sinfo->str_rights);
+		}
 		if (sinfo->user_name)
+		{
 			free(sinfo->user_name);
+			sinfo->user_name = NULL;
+
+			//printf("[%s]\n", sinfo->user_name);
+		}
 		if (sinfo->grp_name)
 			free(sinfo->grp_name);
 		if (sinfo->date)
@@ -30,13 +39,25 @@ void	delete_me(t_info *sinfo)
 		if (sinfo->filename)
 			free(sinfo->filename);
 		if (sinfo->file_type == 6)
+		{
 			free(sinfo->linkedfile);
+			sinfo->linkedfile = NULL;
+
+			//printf("[%s]\n",sinfo->linkedfile);
+		}
 		if (sinfo->tree)
 			delete_me(sinfo->tree);
-		next = sinfo->next;
+		sinfo->grp_name = NULL;
+		sinfo->date = NULL;
+		sinfo->filename  = NULL;
+
+		next = sinfo;
+		sinfo = sinfo->next;
 		//free(sinfo->next);
-		free(sinfo);
-		sinfo = next;
+		//printf("[%s][%s][%s]\n", sinfo->grp_name, sinfo->date, sinfo->filename);
+		free(next);
+		next = NULL;
+		//sinfo = next;
 	}
 }
 
@@ -47,7 +68,7 @@ void	delete_array(char **d)
 	x = 0;
 	while (d[x] != NULL)
 	{
-		printf("bye[%s]\n", d[x]);
+		//printf("bye[%s]\n", d[x]);
 		free(d[x]);
 		x++;
 	}

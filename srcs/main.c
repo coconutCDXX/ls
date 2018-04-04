@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/02 21:49:40 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/04 00:30:58 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,15 @@ t_opt	set_options_zero(char *options)
 	opt.t = FALSE;
 	if (options != NULL)
 	{
-		if (strchr(options, 'a'))
+		if (ft_strchr(options, 'a'))
 			opt.a = TRUE;
-		if (strchr(options, 'l'))
+		if (ft_strchr(options, 'l'))
 			opt.l = TRUE;
-		if (strchr(options, 'R'))
+		if (ft_strchr(options, 'R'))
 			opt.R = TRUE;
-		if (strchr(options, 'r'))
+		if (ft_strchr(options, 'r'))
 			opt.r = TRUE;
-		if (strchr(options, 't'))
+		if (ft_strchr(options, 't'))
 			opt.t = TRUE;
 	}
 	return (opt);
@@ -79,8 +79,8 @@ char	**folders_av(int ac, char **av, int *nf, t_opt opt)
 		//printf("av[x] [%s]\n", av[x]);
 		if (!(stat(av[x], &stats)) && (S_ISDIR(stats.st_mode)))
 		{
-			ret[y] = (char*)malloc(sizeof(char) * strlen(av[x]) + 1);
-			strcpy(ret[y], av[x]);
+			ret[y] = (char*)malloc(sizeof(char) * ft_strlen(av[x]) + 1);
+			ft_strcpy(ret[y], av[x]);
 			//printf("folders array ret[%s]\n", ret[y]);
 			y++;
 		}
@@ -110,7 +110,7 @@ void	save_command(int ac, char **av, char *options)
 		if (folders[0] != NULL)
 		{
 			save_folders(folders, opt);
-			//delete_array(folders);
+			delete_array(folders);
 		}
 		exit(1);
 	}
@@ -247,6 +247,7 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 		sinfo->p_dir_cont = 1;
 		treename = create_treename(read->d_name, filename);
 		set_data(sinfo, treename, read->d_name, b);
+		//printf("save_data1[%s][%d]\n", sinfo->filename, sinfo->dir_cont);
 		if (sinfo->dir_cont > 1)
 		{
 			sinfo->next = (t_info*)malloc(sizeof(t_info));
@@ -255,8 +256,8 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 		}
 		else
 			sinfo->next = NULL;
-		// if (treename != read->d_name)
-		// 	free(treename);
+		if (treename != read->d_name)
+			free(treename);
 	}
 	closedir(p);
 }
@@ -265,12 +266,12 @@ char	*create_treename(char *read, char *filename)
 {
 	char		*ret;
 
-	if (!(strcmp(filename, "./")))
+	if (!(ft_strcmp(filename, "./")))
 		return (read);
-	ret = (char*)malloc(sizeof(char) + strlen(read) + strlen(filename) + 2);
-	strcpy(ret, filename);
-	strcat(ret, "/");
-	strcat(ret, read);
+	ret = (char*)malloc(sizeof(char) + ft_strlen(read) + ft_strlen(filename) + 2);
+	ft_strcpy(ret, filename);
+	ft_strcat(ret, "/");
+	ft_strcat(ret, read);
 	return (ret);
 }
 
@@ -294,16 +295,16 @@ int		count_dir(char *filename, char a)
 		{
 			//printf("[%c][%d]+1 its a dir [%s][%s]\n",a , i, filename, read->d_name);
 			i++;
-			if (lstat(treename, &stats) == 0 && S_ISLNK(stats.st_mode))
-			{
-				//printf("found a link\n");
-				i -= 1;
-			}
+			// if (lstat(treename, &stats) == 0 && S_ISLNK(stats.st_mode))
+			// {
+			// 	//printf("found a link\n");
+			// 	i -= 1;
+			// }
 		}
 		//else
 		//	printf("[%c] nononononono [%s][%s]\n", a, filename, read->d_name);
-		// if (treename != read->d_name)
-		// 	free(treename);
+		if (treename != read->d_name)
+			free(treename);
 	}
 	closedir(p);
 	return (i);
@@ -328,9 +329,9 @@ int		valid_options(char o, char *cmp_options)
 		}
 		else
 		{
-			write(1, "ls: invalid option -- '", 23);
+			write(1, "ft_ls: invalid option -- '", 26);
 			write(1, &o, 1);
-			write(1, "'\nTry 'ls --help' for more information\n", 39);
+			write(1, "'\nusage: ./ft_ls [-Ralrt] [file ...]\n", 38);
 			exit(1);
 		}
 	}

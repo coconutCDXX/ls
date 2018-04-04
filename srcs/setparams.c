@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/02 22:43:26 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/04 00:32:45 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void	set_data(t_info *sinfo, char *treename, char *name, boolean b)
 	if (sinfo->file_type == 6)
 	{
 		set_lstat(sinfo, treename, name, b);
+		//printf("set_data{%s}\n", sinfo->filename);
 		return;
 	}
 	set_rights(sinfo, stats);
@@ -29,7 +30,7 @@ void	set_data(t_info *sinfo, char *treename, char *name, boolean b)
 	set_uid_gid_size(sinfo, stats);
 	set_time(sinfo, stats);
 	if (sinfo->str_rights[0] == 'd' &&
-	(strcmp(name, "..") != 0) && (strcmp(name, ".") != 0) && b == 1)
+	(ft_strcmp(name, "..") != 0) && (ft_strcmp(name, ".") != 0) && b == 1)
 	{
 		//printf("tree mode\n");
 		sinfo->tree = (t_info*)malloc(sizeof(t_info));
@@ -38,6 +39,7 @@ void	set_data(t_info *sinfo, char *treename, char *name, boolean b)
 	}
 	else
 		sinfo->tree = NULL;
+	//printf("set_data{%s}\n", sinfo->filename);
 }
 
 void	set_lstat(t_info *sinfo, char *treename, char *name, boolean b)
@@ -45,13 +47,14 @@ void	set_lstat(t_info *sinfo, char *treename, char *name, boolean b)
 	struct stat stats;
 
 	lstat(treename, &stats);
+	// set_types_name()
 	set_rights(sinfo, stats);
 	if (sinfo->str_rights[0] == 'd')
 		sinfo->p_dir_cont = count_dir(treename, sinfo->str_rights[0]);
 	set_uid_gid_size(sinfo, stats);
 	set_time(sinfo, stats);
 	if (sinfo->str_rights[0] == 'd'
-	&& (strcmp(name, "..") != 0) && (strcmp(name, ".") != 0) && b == 1)
+	&& (ft_strcmp(name, "..") != 0) && (ft_strcmp(name, ".") != 0) && b == 1)
 	{
 		//printf("tree mode\n");
 		sinfo->tree = (t_info*)malloc(sizeof(t_info));
@@ -66,52 +69,54 @@ void	set_time(t_info *sinfo, struct stat stats)
 {
 	int			l;
 
-	l = strlen(ctime(&stats.st_mtime));
+	l = ft_strlen(ctime(&stats.st_mtime));
 	sinfo->date = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->date, ctime(&stats.st_mtime));
+	ft_strcpy(sinfo->date, ctime(&stats.st_mtime));
 	sinfo->time_sort = stats.st_mtime;
 }
 
 void	set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stats)
 {
 	int			l;
-	int			k;
+	//int			k;
 	long long int ls;
 	char			*w;
-	char			*rl;
+//char			*rl;
 
-	l = strlen(dname);
+	l = ft_strlen(dname);
 	sinfo->file_type = 1;
 	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->filename, dname);
+	ft_strcpy(sinfo->filename, dname);
+	//printf("filename (%s)\n", sinfo->filename);
 	if (lstat(filename, &stats) == 0 && S_ISLNK(stats.st_mode))
 	{
 		sinfo->file_type = 6;
-		rl = (char*)malloc(sizeof(char) * 100);
+		//rl = (char*)malloc(sizeof(char) * stats.st_size);
 		//printf("this is a link [%s]\n", dname);
-		ls = readlink(filename, rl, 100);
-		k = strlen(rl);
-		w = (char*)malloc(sizeof(char) * (k + l + 5));
-		printf("stats.st_size [%d](%lld)[%lld] {%s}{%s}\n", k, ls, stats.st_size, filename, rl);
+		w = (char*)malloc(sizeof(char) * (stats.st_size + l + 5));
+		ls = readlink(filename, w + l + 4, stats.st_size);
+			//k = ft_strlen(rl);
+		//printf("stats.st_size [%lld](%lld)[%lld] {%s}\n", ls, ls, stats.st_size, filename);
 
-		//printf("[%s] [%lld] [%ld] pointee\n", w, stats.st_size , (long int)l + 5);
+			//printf("[%s] [%lld] [%ld] pointee\n", w, stats.st_size , (long int)l + 5);
 		//memmove(w + l + 4, w, stats.st_size);
-		//printf("[%p] [%p]filename [%s][%lu]\n", w + l + 4, w, w, strlen(w));
-		w[l + 4 + stats.st_size] = '\0';
-		//printf("null terminated filename [%s]\n", w);
-		strcpy(w, dname);
-		//printf("w.o end filename [%s]\n", w);
+			//printf("[%p] [%p]filename [%s][%lu]\n", w + l + 4, w, w, ft_strlen(w));
+			//printf("null terminated filename [%s]\n", w);
+		ft_strcpy(w, dname);
+			//printf("w.o end filename [%s]\n", w);
 		w[l] = ' ';
 		w[l + 1] = '-';
 		w[l + 2] = '>';
 		w[l + 3] = ' ';
-		strncat(w, rl, k);
-		//printf("final filename [%s][%lu]\n", w, strlen(w));
-		sinfo->linkedfile = (char*)malloc(sizeof(char) * strlen(w) + 1);
-		strcpy(sinfo->linkedfile, w);
-		sinfo->linkedfile[strlen(w)] = '\0';
+		//strncat(w, rl, ls);
+		w[l + 4 + stats.st_size] = '\0';
+			//printf("final filename [%s][%lu]\n", w, ft_strlen(w));
+		sinfo->linkedfile = (char*)malloc(sizeof(char) * ft_strlen(w) + 1);
+		ft_strcpy(sinfo->linkedfile, w);
+		sinfo->linkedfile[ft_strlen(w)] = '\0';
 		free(w);
-		free(rl);
+		//printf("sinfo[%s]\n", sinfo->linkedfile);
+		//free(rl);
 	}
 	//printf("sinfo->file_type [%s] [%s] [%d]\n", filename, sinfo->filename, sinfo->file_type);
 }
@@ -189,12 +194,12 @@ void	set_uid_gid_size(t_info *sinfo, struct stat stats)
 
 	sinfo->block_cont = (int)stats.st_blocks;
 	person = getpwuid(stats.st_uid);
-	l = strlen(person->pw_name);
+	l = ft_strlen(person->pw_name);
 	sinfo->user_name = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->user_name, person->pw_name);
+	ft_strcpy(sinfo->user_name, person->pw_name);
 	grp = getgrgid(stats.st_gid);
-	l = strlen(grp->gr_name);
+	l = ft_strlen(grp->gr_name);
 	sinfo->grp_name = (char*)malloc(sizeof(char) * l + 1);
-	strcpy(sinfo->grp_name, grp->gr_name);
+	ft_strcpy(sinfo->grp_name, grp->gr_name);
 	sinfo->bytes = stats.st_size;
 }
