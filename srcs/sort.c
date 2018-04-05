@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 00:34:11 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/05 02:13:26 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,13 @@
 
 void	sort_command(t_info *sinfo, t_opt opt)
 {
-	//printf("enterring command control sort over over\n");
 	sort_by_alpha(&sinfo);
-//	printf("i sorted by alpha!!!!!!!\n");
 	if (opt.t == TRUE)
-	{
 		sort_by_time(&sinfo, opt);
-		//printf("i sorted by t\n");
-	}
 	if (opt.r == TRUE)
 		sort_by_r(&sinfo, opt);
 	print_rec(&sinfo, opt);
-
 	delete_me(sinfo);
-//	printf("sort_command is sinfo alive? [%s]\n", sinfo->filename);
-//	printf("print all done return\n");
 }
 
 void	sort_by_r(t_info **sinfo, t_opt opt)
@@ -75,7 +67,6 @@ void	sort_by_alpha(t_info **sinfo)
 	current = *sinfo;
 	while (current->next)
 	{
-		//printf("1. 2. [%s] [%s]\n", current->filename, current->next->filename);
 		if (check_alpha(current->filename, current->next->filename))
 		{
 			tmp = current->next;
@@ -93,36 +84,9 @@ void	sort_by_alpha(t_info **sinfo)
 			current = current->next;
 		}
 		if (current->tree != NULL)
-		{
-			//printf("dangerzone\n");
 			sort_by_alpha(&(current->tree));
-		}
-		//printf("third\n");
 	}
 }
-
-// void	sort_trees(t_info **sinfo)
-// {
-// 	t_info *current;
-// 	t_info *start;
-//
-// 	current = *sinfo;
-// 	start = *sinfo;
-// 	while (current->next)
-// 	{
-// 		if (current->tree != NULL)
-// 		{
-// 			current = current->tree;
-// 			while (current->next)
-// 			{
-// 				sort_by_alpha(&current);
-// 				current = current->next;
-// 			}
-// 		}
-// 		else
-// 			start = start->next;
-// 	}
-// }
 
 int		check_alpha(char *a, char *b)
 {
@@ -131,179 +95,37 @@ int		check_alpha(char *a, char *b)
 
 	j = 0;
 	i = 0;
-	if (check_alpha_start(a, b) != 2)
-		return(check_alpha_start(a, b));
-	else if (a[j] == '.' || b[i] == '.')
-		return (check_alpha_hidden(a, b));
-	else
-		return (check_alpha_hidden(a , b ));
-	return (0);
-}
-
-int		check_alpha_start(char *a, char *b)
-{
-	if (!(ft_strcmp(a, ".")) || (!(ft_strcmp(a, "..")) && ft_strcmp(b, ".") != 0))
+	if (!(ft_strcmp(a, ".")) || (!(ft_strcmp(a, ".."))
+	&& ft_strcmp(b, ".") != 0))
 		return (0);
-	if (!(ft_strcmp(b, ".")) || (!(ft_strcmp(b, "..")) && ft_strcmp(a, ".") != 0))
+	if (!(ft_strcmp(b, ".")) || (!(ft_strcmp(b, ".."))
+	&& ft_strcmp(a, ".") != 0))
 		return (1);
-	return (2);
-}
-
-int		check_alpha_hidden(char *a, char *b)
-{
-	int i;
-	int j;
-
-	i = 0;
-	j = 0;
-	//printf("a[%s] b[%s]\n", a,b);
 	while (a[j] == b[i])
 	{
 		j++;
 		i++;
 	}
 	return (check_alpha_bis(b[i], a[j]));
-	// if (a[i] != '.' || b[i] != '.')
-	// 	return(check_alpha_bis(a[j], b[i]))
-	// printf("i loop %s %s\n", a,b);
-	// return (check_alpha(a + j, b + i));
 }
 
 int		check_alpha_bis(char x, char y)
 {
 	if (y >= 65 && y <= 90 && !(x >= 65 && x <= 90))
 	{
-		if (y + 32 > x)
+		if (y > x)
 			return (1);
 		else
 			return (0);
 	}
 	if (x >= 65 && x <= 90 && !(y >= 65 && y <= 90))
 	{
-		if (x + 32 < y)
+		if (x < y)
 			return (1);
 		else
 			return (0);
 	}
-	//printf("%c<->%c\n", x,y);
 	if (y > x)
 		return (1);
 	return (0);
-}
-
-void	sort_by_time(t_info **sinfo, t_opt opt)
-{
-	t_info *current;
-	t_info *tmp;
-	t_info *start;
-
-	start = *sinfo;
-	current = *sinfo;
-	while (current->next)
-	{
-		if (current->time_sort < current->next->time_sort)
-		{
-			tmp = current->next;
-			current->next = tmp->next;
-			tmp->next = current;
-			if (*sinfo == current)
-				*sinfo = tmp;
-			else
-				start->next = tmp;
-			current = *sinfo;
-		}
-		else
-		{
-			start = current;
-			current = current->next;
-		}
-		if (opt.R == TRUE && current->tree != NULL)
-			sort_by_r(&(current->tree), opt);
-	}
-}
-
-void	sort_folders(char **f, t_opt opt)
-{
-	int		x;
-	char	*tmp;
-
-	x = 0;
-	while (f[x + 1] != NULL)
-	{
-		if (check_alpha(f[x], f[x + 1]))
-		{
-			tmp = f[x + 1];
-			f[x + 1] = f[x];
-			f[x] = tmp;
-			x = 0;
-			continue;
-		}
-		x++;
-	}
-	if (opt.t)
-		sort_time_folders(f);
-	if (opt.r)
-		sort_rev_folders(f);
-}
-
-void	sort_rev_folders(char **f)
-{
-	int		y;
-	int		z;
-	char	*save;
-
-	z = 0;
-	y = 0;
-	while (f[z])
-			z++;
-	z--;
-	while (y < z - y)
-	{
-		save = f[y];
-		f[y] = f[z - y];
-		f[z - y] = save;
-		y++;
-	}
-	// y = 0;
-	// x = 0;
-	// while (f[y])
-	// 	y++;
-	// y--;
-	// new = (char**)malloc(sizeof(char*) * y);
-	// while (y - x >= 0)
-	// {
-	// 	z = strlen(f[y - x]);
-	// 	new[x] = (char*)malloc(sizeof(char) * z + 1);
-	// 	strcpy(new[x], f[y - x]);
-	// 	x++;
-	// }
-	// return (new);
-}
-
-time_t	check_time(char *t)
-{
-	struct stat	stats;
-
-	stat(t, &stats);
-	return (stats.st_mtime);
-}
-
-void	sort_time_folders(char **f)
-{
-	int		x;
-	char	*tmp;
-
-	x = 0;
-	while (f[x + 1] != NULL)
-	{
-		if (check_time(f[x]) < check_time(f[x + 1]))
-		{
-			tmp = f[x + 1];
-			f[x + 1] = f[x];
-			f[x] = tmp;
-			x = 0;
-			continue;
-		}
-		x++;
-	}
 }

@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 00:46:11 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/05 01:57:07 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,40 +17,36 @@ void		print_rec(t_info **sinfo, t_opt opt)
 	t_info *tmp;
 
 	tmp = *sinfo;
-	// if (tmp->next != NULL)
 	print_blocks(*sinfo, opt);
 	while (tmp)
 	{
-		//printf("filename>%s<\n", tmp->filename);
-		if (opt.a == TRUE && (tmp->filename[0] == '.'))
-		{
-			write_it_all(tmp, opt);
-			tmp = tmp->next;
-			continue;
-		}
 		if (!(tmp->filename[0] == '.'))
+			write_it_all(tmp, opt);
+		if (opt.a == TRUE && (tmp->filename[0] == '.'))
 			write_it_all(tmp, opt);
 		tmp = tmp->next;
 	}
-	//printf("exit loop\n");
 	tmp = *sinfo;
 	while (tmp && opt.R == TRUE)
 	{
 		if (tmp->tree != NULL)
 		{
-			//printf("i found a LITTLE TREE! [%s]\n", tmp->tree->filename);
+			write(1, "\n./", 3);
+			write(1, tmp->filepath, ft_strlen(tmp->filepath));
+			write(1, "\n", 1);
 			print_rec(&(tmp->tree), opt);
 		}
 		tmp = tmp->next;
 	}
 }
+
 void		print_blocks(t_info *sinfo, t_opt opt)
 {
 	int block;
 
 	block = 0;
 	if (opt.l != TRUE)
-		return;
+		return ;
 	while (sinfo)
 	{
 		if (opt.a == FALSE && sinfo->filename[0] == '.')
@@ -68,45 +64,29 @@ void		print_blocks(t_info *sinfo, t_opt opt)
 
 void		write_it_all(t_info *sinfo, t_opt opt)
 {
-	int l;
-
 	if (opt.l == TRUE)
 	{
-		//write(1, &sinfo->block_cont, 2);
-		//write(1, "total ", 6);
-		//ft_putnbr(sinfo->dir_cont);
-		//write(1, "\n", 1);
 		write(1, sinfo->str_rights, 10);
 		write(1, "  ", 2);
 		ft_putnbr(sinfo->p_dir_cont);
 		ft_putchar(' ');
-		l = ft_strlen(sinfo->user_name);
-		write(1, sinfo->user_name, l);
+		write(1, sinfo->user_name, ft_strlen(sinfo->user_name));
 		write(1, "  ", 2);
-		l = ft_strlen(sinfo->grp_name);
-		write(1, sinfo->grp_name, l);
+		write(1, sinfo->grp_name, ft_strlen(sinfo->grp_name));
 		write(1, "  ", 2);
 		ft_putnbr(sinfo->bytes);
 		write(1, "    ", 4);
 		write(1, sinfo->date + 4, 12);
 		ft_putchar(' ');
-		//printf("my file type is [%d]\n", sinfo->file_type);
 		if (sinfo->file_type == 6)
 			write(1, sinfo->linkedfile, ft_strlen(sinfo->linkedfile));
 		else
 			write(1, sinfo->filename, ft_strlen(sinfo->filename));
 		ft_putchar('\n');
-		return;
-		//l = ft_strlen(sinfo->filename);
-		//write(1, sinfo->filename, l);
-		//return;
+		return ;
 	}
-	l = ft_strlen(sinfo->filename);
-	write(1, sinfo->filename, l);
-	//write(1, "\t", 1);
+	write(1, sinfo->filename, ft_strlen(sinfo->filename));
 	ft_putchar('\n');
-	//printf("\nwhats sinfo? [%s]", sinfo->filename);
-//	printf("\n--end write [%d]\n\n\n", l);
 }
 
 void		print_errors(char **av)
@@ -129,7 +109,7 @@ void		print_errors(char **av)
 	}
 }
 
-void	print_error_perm(char *filename)
+void		print_error_perm(char *filename)
 {
 	write(1, "ls: ", 4);
 	write(1, filename, ft_strlen(filename));

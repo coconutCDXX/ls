@@ -6,124 +6,43 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/04 22:03:43 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/05 02:21:00 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ls_lib.h"
 
-void	set_data(t_info *sinfo, char *treename, char *name, boolean b)
+t_opt	set_options_zero(char *options)
 {
-	struct stat		stats;
+	t_opt opt;
 
-	stat(treename, &stats);
-	set_types_name(sinfo, treename, name, stats);
-	if (sinfo->file_type == 6)
+	opt.a = FALSE;
+	opt.l = FALSE;
+	opt.R = FALSE;
+	opt.r = FALSE;
+	opt.t = FALSE;
+	if (options != NULL)
 	{
-		set_lstat(sinfo, treename, name, b);
-		//printf("set_data{%s}\n", sinfo->filename);
-		return;
+		if (ft_strchr(options, 'a'))
+			opt.a = TRUE;
+		if (ft_strchr(options, 'l'))
+			opt.l = TRUE;
+		if (ft_strchr(options, 'R'))
+			opt.R = TRUE;
+		if (ft_strchr(options, 'r'))
+			opt.r = TRUE;
+		if (ft_strchr(options, 't'))
+			opt.t = TRUE;
 	}
-	set_rights(sinfo, stats);
-	if (sinfo->str_rights[0] == 'd')
-		sinfo->p_dir_cont = count_dir(treename, 'd');
-	set_uid_gid_size(sinfo, stats);
-	set_time(sinfo, stats);
-	if (sinfo->str_rights[0] == 'd' &&
-	(ft_strcmp(name, "..") != 0) && (ft_strcmp(name, ".") != 0) && b == 1)
-	{
-		//printf("tree mode\n");
-		sinfo->tree = (t_info*)malloc(sizeof(t_info));
-		//printf("tree[%s]\n", treename);
-		save_data1(sinfo->tree, treename, b);
-	}
-	else
-		sinfo->tree = NULL;
-	//printf("set_data{%s}\n", sinfo->filename);
+	return (opt);
 }
 
-void	set_lstat(t_info *sinfo, char *treename, char *name, boolean b)
+void	set_rights_time(t_info *sinfo, struct stat stats)
 {
-	struct stat stats;
-
-	lstat(treename, &stats);
-	// set_types_name()
-	set_rights(sinfo, stats);
-	if (sinfo->str_rights[0] == 'd')
-		sinfo->p_dir_cont = count_dir(treename, sinfo->str_rights[0]);
-	set_uid_gid_size(sinfo, stats);
-	set_time(sinfo, stats);
-	if (sinfo->str_rights[0] == 'd'
-	&& (ft_strcmp(name, "..") != 0) && (ft_strcmp(name, ".") != 0) && b == 1)
-	{
-		//printf("tree mode\n");
-		sinfo->tree = (t_info*)malloc(sizeof(t_info));
-		//printf("tree[%s]\n", treename);
-		save_data1(sinfo->tree, treename, b);
-	}
-	else
-		sinfo->tree = NULL;
-}
-
-void	set_time(t_info *sinfo, struct stat stats)
-{
-//	int			l;
-
-	//l = ft_strlen(ctime(&stats.st_mtime));
 	sinfo->date = (char*)malloc(sizeof(char) * 25);
 	ft_strcpy(sinfo->date, ctime(&stats.st_mtime));
 	sinfo->date[24] = '\0';
 	sinfo->time_sort = stats.st_mtime;
-}
-
-void	set_types_name(t_info *sinfo, char *filename, char *dname, struct stat stats)
-{
-	int			l;
-	//int			k;
-	long long int ls;
-	char			*w;
-//char			*rl;
-
-	l = ft_strlen(dname);
-	sinfo->file_type = 1;
-	sinfo->filename = (char*)malloc(sizeof(char) * l + 1);
-	ft_strcpy(sinfo->filename, dname);
-	//printf("filename (%s)\n", sinfo->filename);
-	if (lstat(filename, &stats) == 0 && S_ISLNK(stats.st_mode))
-	{
-		sinfo->file_type = 6;
-		//rl = (char*)malloc(sizeof(char) * stats.st_size);
-		//printf("this is a link [%s]\n", dname);
-		w = (char*)malloc(sizeof(char) * (stats.st_size + l + 5));
-		ls = readlink(filename, w + l + 4, stats.st_size);
-			//k = ft_strlen(rl);
-		//printf("stats.st_size [%lld](%lld)[%lld] {%s}\n", ls, ls, stats.st_size, filename);
-
-			//printf("[%s] [%lld] [%ld] pointee\n", w, stats.st_size , (long int)l + 5);
-		//memmove(w + l + 4, w, stats.st_size);
-			//printf("[%p] [%p]filename [%s][%lu]\n", w + l + 4, w, w, ft_strlen(w));
-			//printf("null terminated filename [%s]\n", w);
-		ft_strcpy(w, dname);
-			//printf("w.o end filename [%s]\n", w);
-		w[l] = ' ';
-		w[l + 1] = '-';
-		w[l + 2] = '>';
-		w[l + 3] = ' ';
-		//strncat(w, rl, ls);
-		w[l + 4 + stats.st_size] = '\0';
-			//printf("final filename [%s][%lu]\n", w, ft_strlen(w));
-		sinfo->linkedfile = (char*)malloc(sizeof(char) * ft_strlen(w) + 1);
-		ft_strcpy(sinfo->linkedfile, w);
-		sinfo->linkedfile[ft_strlen(w)] = '\0';
-		free(w);
-		//printf("sinfo[%s]\n", sinfo->linkedfile);
-		//free(rl);
-	}
-	//printf("sinfo->file_type [%s] [%s] [%d]\n", filename, sinfo->filename, sinfo->file_type);
-}
-
-void	set_rights(t_info *sinfo, struct stat stats)
-{
 	sinfo->str_rights = (char*)malloc(sizeof(char) * 11);
 	sinfo->str_rights[0] = '-';
 	if (sinfo->file_type == 6)
