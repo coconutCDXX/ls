@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/04 00:32:45 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/04 22:03:43 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,12 @@ void	set_lstat(t_info *sinfo, char *treename, char *name, boolean b)
 
 void	set_time(t_info *sinfo, struct stat stats)
 {
-	int			l;
+//	int			l;
 
-	l = ft_strlen(ctime(&stats.st_mtime));
-	sinfo->date = (char*)malloc(sizeof(char) * l + 1);
+	//l = ft_strlen(ctime(&stats.st_mtime));
+	sinfo->date = (char*)malloc(sizeof(char) * 25);
 	ft_strcpy(sinfo->date, ctime(&stats.st_mtime));
+	sinfo->date[24] = '\0';
 	sinfo->time_sort = stats.st_mtime;
 }
 

@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/02 20:08:42 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/05 00:14:50 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ void				sort_by_time(t_info **sinfo, t_opt opt);
 void				sort_by_alpha(t_info **sinfo);
 int					check_alpha(char *a, char *b);
 int					check_alpha_bis(char x, char y);
+int					check_alpha_hidden(char *a, char *b);
+int					check_alpha_start(char *a, char *b);
 void				sort_folders(char **f, t_opt opt);
 void				sort_rev_folders(char **f);
 void				sort_time_folders(char **f);

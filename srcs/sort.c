@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/04 00:33:12 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/05 00:34:11 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,28 +131,53 @@ int		check_alpha(char *a, char *b)
 
 	j = 0;
 	i = 0;
-	if (!(ft_strcmp(b, "..")) && !(ft_strcmp(a, ".")))
-		return (0);
-	if (a[j] == '.')
-		j++;
-	if (b[i] == '.')
-		i++;
-	if (a[j] >= 65 && a[j] <= 90 && !(b[i] >= 65 && b[i] <= 90))
-	{
-		if (a[j] + 32 > b[i])
-			return (1);
-		else
-			return (0);
-	}
-	if (check_alpha_bis(b[i], a[j]) != 2)
-		return (check_alpha_bis(b[i], a[j]));
-	if (a[j] == b[i])
-		return (check_alpha(a + 1, b + 1));
+	if (check_alpha_start(a, b) != 2)
+		return(check_alpha_start(a, b));
+	else if (a[j] == '.' || b[i] == '.')
+		return (check_alpha_hidden(a, b));
+	else
+		return (check_alpha_hidden(a , b ));
 	return (0);
+}
+
+int		check_alpha_start(char *a, char *b)
+{
+	if (!(ft_strcmp(a, ".")) || (!(ft_strcmp(a, "..")) && ft_strcmp(b, ".") != 0))
+		return (0);
+	if (!(ft_strcmp(b, ".")) || (!(ft_strcmp(b, "..")) && ft_strcmp(a, ".") != 0))
+		return (1);
+	return (2);
+}
+
+int		check_alpha_hidden(char *a, char *b)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	//printf("a[%s] b[%s]\n", a,b);
+	while (a[j] == b[i])
+	{
+		j++;
+		i++;
+	}
+	return (check_alpha_bis(b[i], a[j]));
+	// if (a[i] != '.' || b[i] != '.')
+	// 	return(check_alpha_bis(a[j], b[i]))
+	// printf("i loop %s %s\n", a,b);
+	// return (check_alpha(a + j, b + i));
 }
 
 int		check_alpha_bis(char x, char y)
 {
+	if (y >= 65 && y <= 90 && !(x >= 65 && x <= 90))
+	{
+		if (y + 32 > x)
+			return (1);
+		else
+			return (0);
+	}
 	if (x >= 65 && x <= 90 && !(y >= 65 && y <= 90))
 	{
 		if (x + 32 < y)
@@ -160,9 +185,10 @@ int		check_alpha_bis(char x, char y)
 		else
 			return (0);
 	}
+	//printf("%c<->%c\n", x,y);
 	if (y > x)
 		return (1);
-	return (2);
+	return (0);
 }
 
 void	sort_by_time(t_info **sinfo, t_opt opt)

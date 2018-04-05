@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/04 00:27:07 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/05 00:46:11 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,9 +87,8 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 		write(1, sinfo->grp_name, l);
 		write(1, "  ", 2);
 		ft_putnbr(sinfo->bytes);
-		ft_putchar(' ');
-		l = ft_strlen(sinfo->date);
-		write(1, sinfo->date, l);
+		write(1, "    ", 4);
+		write(1, sinfo->date + 4, 12);
 		ft_putchar(' ');
 		//printf("my file type is [%d]\n", sinfo->file_type);
 		if (sinfo->file_type == 6)
@@ -104,7 +103,7 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 	}
 	l = ft_strlen(sinfo->filename);
 	write(1, sinfo->filename, l);
-	write(1, "\t", 1);
+	//write(1, "\t", 1);
 	ft_putchar('\n');
 	//printf("\nwhats sinfo? [%s]", sinfo->filename);
 //	printf("\n--end write [%d]\n\n\n", l);
