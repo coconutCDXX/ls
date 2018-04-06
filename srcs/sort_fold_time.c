@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:11:07 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 02:13:38 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/06 01:27:15 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	sort_folders(char **f, t_opt opt)
 		sort_rev_folders(f);
 }
 
-void	sort_by_time(t_info **sinfo, t_opt opt)
+void	sort_by_time(t_info **sinfo)
 {
 	t_info *current;
 	t_info *tmp;
@@ -102,8 +102,6 @@ void	sort_by_time(t_info **sinfo, t_opt opt)
 			start = current;
 			current = current->next;
 		}
-		if (opt.R == TRUE && current->tree != NULL)
-			sort_by_r(&(current->tree), opt);
 	}
 }
 

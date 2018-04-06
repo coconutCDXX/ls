@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/02 19:36:27 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 02:09:20 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/06 09:40:09 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	delete_me(t_info *sinfo)
 			free(sinfo->linkedfile);
 		if (sinfo->filepath)
 			free(sinfo->filepath);
-		if (sinfo->tree)
+		if (sinfo->tree != NULL)
 			delete_me(sinfo->tree);
 		next = sinfo;
 		sinfo = sinfo->next;

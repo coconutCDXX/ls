@@ -6,18 +6,19 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 01:57:07 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/06 10:40:14 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ls_lib.h"
 
-void		print_rec(t_info **sinfo, t_opt opt)
+void		print_rec(t_info **sinfo, t_opt opt, t_boolean b)
 {
 	t_info *tmp;
 
 	tmp = *sinfo;
-	print_blocks(*sinfo, opt);
+	if (b == TRUE)
+		print_blocks(*sinfo, opt);
 	while (tmp)
 	{
 		if (!(tmp->filename[0] == '.'))
@@ -27,14 +28,14 @@ void		print_rec(t_info **sinfo, t_opt opt)
 		tmp = tmp->next;
 	}
 	tmp = *sinfo;
-	while (tmp && opt.R == TRUE)
+	while (tmp && opt.cr == TRUE)
 	{
 		if (tmp->tree != NULL)
 		{
-			write(1, "\n./", 3);
-			write(1, tmp->filepath, ft_strlen(tmp->filepath));
 			write(1, "\n", 1);
-			print_rec(&(tmp->tree), opt);
+			write(1, tmp->filepath, ft_strlen(tmp->filepath));
+			write(1, ":\n", 2);
+			print_rec(&(tmp->tree), opt, TRUE);
 		}
 		tmp = tmp->next;
 	}
@@ -69,23 +70,23 @@ void		write_it_all(t_info *sinfo, t_opt opt)
 		write(1, sinfo->str_rights, 10);
 		write(1, "  ", 2);
 		ft_putnbr(sinfo->p_dir_cont);
-		ft_putchar(' ');
+		ft_putchar('\t');
 		write(1, sinfo->user_name, ft_strlen(sinfo->user_name));
 		write(1, "  ", 2);
 		write(1, sinfo->grp_name, ft_strlen(sinfo->grp_name));
 		write(1, "  ", 2);
-		ft_putnbr(sinfo->bytes);
-		write(1, "    ", 4);
+		write_major_minor(sinfo);
+		write(1, " \t", 2);
 		write(1, sinfo->date + 4, 12);
 		ft_putchar(' ');
-		if (sinfo->file_type == 6)
-			write(1, sinfo->linkedfile, ft_strlen(sinfo->linkedfile));
-		else
-			write(1, sinfo->filename, ft_strlen(sinfo->filename));
+		write_pretty_colors(sinfo);
 		ft_putchar('\n');
 		return ;
 	}
+	if (sinfo->str_rights[0] == 'd')
+		write(1, CYAN, 10);
 	write(1, sinfo->filename, ft_strlen(sinfo->filename));
+	write(1, FLUSH, 4);
 	ft_putchar('\n');
 }
 

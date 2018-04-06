@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:31 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 02:33:17 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/06 04:39:04 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,22 +26,27 @@ void	save_command(int ac, char **av, char *options)
 	t_opt	opt;
 	t_info	*sinfo;
 	char	**folders;
+	int		fileck;
 
+	fileck = 0;
 	sinfo = (t_info*)malloc(sizeof(t_info));
 	opt = set_options_zero(options);
 	if (check_av(av, ac))
 	{
-		folders = spec_file(ac, av, opt, sinfo);
+		folders = folders_av(ac, av, opt);
+		fileck = spec_file(ac, av, opt, sinfo);
 		if (folders[0] != NULL)
 		{
+			if (fileck == 1)
+				write(1, "\n", 1);
 			save_folders(folders, opt);
 			delete_array(folders);
 		}
 		exit(1);
 	}
-	save_data1(sinfo, "./", opt.R);
+	save_data1(sinfo, "./", opt.cr);
 	if (sinfo->filename)
-	sort_command(sinfo, opt);
+		sort_command(sinfo, opt, TRUE);
 }
 
 void	verify_options(char **av, char *ret)

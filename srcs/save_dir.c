@@ -6,13 +6,13 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:24:05 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 02:32:00 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/06 11:24:42 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ls_lib.h"
 
-char	**folders_av(int ac, char **av, int *nf, t_opt opt)
+char	**folders_av(int ac, char **av, t_opt opt)
 {
 	int			x;
 	int			y;
@@ -30,9 +30,6 @@ char	**folders_av(int ac, char **av, int *nf, t_opt opt)
 			ft_strcpy(ret[y], av[x]);
 			y++;
 		}
-		else if ((!(stat(av[x], &stats)) && !(S_ISDIR(stats.st_mode)))
-		|| !(lstat(av[x], &stats)))
-			*nf = *nf + 1;
 		x++;
 	}
 	ret[y] = NULL;
@@ -49,16 +46,23 @@ void	save_folders(char **f, t_opt opt)
 	x = 0;
 	while (f[x])
 	{
+		if (x != 0)
+			write(1, "\n", 1);
 		sinfo = (t_info*)malloc(sizeof(t_info));
-		save_data1(sinfo, f[x], opt.R);
+		if (x != 0 || f[1] != NULL)
+		{
+			write(1, f[x], ft_strlen(f[x]));
+			write(1, ":\n", 2);
+		}
+		save_data1(sinfo, f[x], opt.cr);
 		if (sinfo->filename)
-			sort_command(sinfo, opt);
+			sort_command(sinfo, opt, TRUE);
 		sinfo = NULL;
 		x++;
 	}
 }
 
-void	save_data1(t_info *sinfo, char *filename, boolean b)
+void	save_data1(t_info *sinfo, char *filename, t_boolean b)
 {
 	struct dirent	*read;
 	DIR				*p;
@@ -73,8 +77,8 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 	p = opendir(filename);
 	while ((read = readdir(p)) != NULL)
 	{
-		sinfo->p_dir_cont = 1;
 		treename = create_treename(read->d_name, filename);
+		printf("wheres teh seg!!!fml {%s}{%s}{%d}\n", filename, read->d_name, sinfo->dir_cont);
 		set_data(sinfo, treename, read->d_name, b);
 		if (sinfo->dir_cont > 1)
 		{
@@ -84,8 +88,6 @@ void	save_data1(t_info *sinfo, char *filename, boolean b)
 		}
 		else
 			sinfo->next = NULL;
-		if (treename != read->d_name)
-			free(treename);
 	}
 	closedir(p);
 }
@@ -95,7 +97,13 @@ char	*create_treename(char *read, char *filename)
 	char		*ret;
 
 	if (!(ft_strcmp(filename, "./")))
-		return (read);
+	{
+		ret = (char*)malloc(sizeof(char) * (ft_strlen(read) + 3));
+		ret[0] = '.';
+		ret[1] = '/';
+		ft_strcat(ret, read);
+		return (ret);
+	}
 	ret = (char*)malloc(sizeof(char) *
 	(ft_strlen(read) + ft_strlen(filename) + 2));
 	ft_strcpy(ret, filename);
@@ -113,8 +121,7 @@ int		count_dir(char *filename, char a)
 	char			*treename;
 
 	i = 0;
-	p = opendir(filename);
-	if (p == NULL)
+	if ((p = opendir(filename)) == NULL)
 		return (0);
 	while ((read = readdir(p)) != NULL)
 	{
@@ -122,8 +129,8 @@ int		count_dir(char *filename, char a)
 		stat(treename, &stats);
 		if (a == 'x' || S_ISDIR(stats.st_mode))
 			i++;
-		if (treename != read->d_name)
-			free(treename);
+		ft_bzero(treename, ft_strlen(treename));
+		free(treename);
 	}
 	closedir(p);
 	return (i);

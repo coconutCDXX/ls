@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/05 02:21:00 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/06 06:28:38 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_opt	set_options_zero(char *options)
 
 	opt.a = FALSE;
 	opt.l = FALSE;
-	opt.R = FALSE;
+	opt.cr = FALSE;
 	opt.r = FALSE;
 	opt.t = FALSE;
 	if (options != NULL)
@@ -28,7 +28,7 @@ t_opt	set_options_zero(char *options)
 		if (ft_strchr(options, 'l'))
 			opt.l = TRUE;
 		if (ft_strchr(options, 'R'))
-			opt.R = TRUE;
+			opt.cr = TRUE;
 		if (ft_strchr(options, 'r'))
 			opt.r = TRUE;
 		if (ft_strchr(options, 't'))
@@ -122,4 +122,11 @@ void	set_uid_gid_size(t_info *sinfo, struct stat stats)
 	sinfo->grp_name = (char*)malloc(sizeof(char) * l + 1);
 	ft_strcpy(sinfo->grp_name, grp->gr_name);
 	sinfo->bytes = stats.st_size;
+	sinfo->device = FALSE;
+	if (sinfo->str_rights[0] == 'c')
+	{
+		sinfo->device = TRUE;
+		sinfo->bytes = major(stats.st_rdev);
+		sinfo->minor = minor(stats.st_rdev);
+	}
 }
