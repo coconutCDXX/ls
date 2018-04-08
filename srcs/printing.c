@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/07 23:50:08 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/08 04:59:23 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,25 @@ void		print_rec(t_info **sinfo, t_opt opt, t_boolean b)
 		tmp = tmp->next;
 	}
 	tmp = *sinfo;
+	if (tmp && opt.cr == TRUE)
+		print_tree(tmp, opt);
+}
+
+void		print_tree(t_info *tmp, t_opt opt)
+{
 	while (tmp && opt.cr == TRUE)
 	{
+		//printf("n(%s) [%d][%d]\n", tmp->filename, tmp->p_dir_cont, tmp->read_and_stat);
+		if (tmp->p_dir_cont == 0 || tmp->read_and_stat == 0)
+			check_permissions(tmp);
+		if (opt.a == FALSE && tmp->filename[0] == '.')
+		{
+			tmp = tmp->next;
+			continue;
+		}
 		if (tmp->tree != NULL && tmp->read_and_stat != 0)
 		{
+
 			write(1, "\n", 1);
 			write(1, tmp->filepath, ft_strlen(tmp->filepath));
 			write(1, ":\n", 2);
@@ -60,35 +75,6 @@ void		print_blocks(t_info *sinfo, t_opt opt)
 	}
 	write(1, "total ", 6);
 	ft_putnbr(block);
-	ft_putchar('\n');
-}
-
-void		write_it_all(t_info *sinfo, t_opt opt)
-{
-	if (sinfo->read_and_stat == 0)
-		return ;
-	if (opt.l == TRUE)
-	{
-		write(1, sinfo->str_rights, 10);
-		write(1, "  ", 2);
-		ft_putnbr(sinfo->p_dir_cont);
-		ft_putchar('\t');
-		write(1, sinfo->user_name, ft_strlen(sinfo->user_name));
-		write(1, "  ", 2);
-		write(1, sinfo->grp_name, ft_strlen(sinfo->grp_name));
-		write(1, "  ", 2);
-		write_major_minor(sinfo);
-		write(1, " \t", 2);
-		write(1, sinfo->date + 4, 12);
-		ft_putchar(' ');
-		write_pretty_colors(sinfo);
-		ft_putchar('\n');
-		return ;
-	}
-	if (sinfo->str_rights[0] == 'd')
-		write(1, CYAN, 10);
-	write(1, sinfo->filename, ft_strlen(sinfo->filename));
-	write(1, FLUSH, 4);
 	ft_putchar('\n');
 }
 

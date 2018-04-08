@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:24:05 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/07 23:51:24 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/08 04:57:25 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,9 @@ void	save_folders(char **f, t_opt opt)
 			write(1, f[x], ft_strlen(f[x]));
 			write(1, ":\n", 2);
 		}
+		sinfo->filename = NULL;
 		save_data1(sinfo, f[x], opt.cr);
-		if (sinfo->filename)
+		if (sinfo->filename != NULL)
 			sort_command(sinfo, opt, TRUE);
 		sinfo = NULL;
 		x++;
@@ -128,6 +129,7 @@ int		count_dir(char *filename, char a)
 		stat(treename, &stats);
 		if (a == 'x' || S_ISDIR(stats.st_mode))
 			i++;
+		//printf("[%d][%s][%s][%c]\n",i, filename, read->d_name, a);
 		ft_bzero(treename, ft_strlen(treename));
 		free(treename);
 	}

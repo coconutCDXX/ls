@@ -6,11 +6,48 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/06 06:27:50 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 08:02:18 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/08 01:33:23 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ls_lib.h"
+
+void		write_it_all(t_info *sinfo, t_opt opt)
+{
+	if (sinfo->read_and_stat == 0)
+		return ;
+	if (opt.l == TRUE)
+	{
+		write(1, sinfo->str_rights, 10);
+		write(1, "  ", 2);
+		ft_putnbr(sinfo->p_dir_cont);
+		ft_putchar('\t');
+		write(1, sinfo->user_name, ft_strlen(sinfo->user_name));
+		write(1, "  ", 2);
+		write(1, sinfo->grp_name, ft_strlen(sinfo->grp_name));
+		write(1, "  ", 2);
+		write_major_minor(sinfo);
+		write(1, " \t", 2);
+		write(1, sinfo->date + 4, 12);
+		ft_putchar(' ');
+		write_pretty_colors(sinfo);
+		ft_putchar('\n');
+		return ;
+	}
+	if (sinfo->str_rights[0] == 'd')
+		write(1, CYAN, 10);
+	write(1, sinfo->filename, ft_strlen(sinfo->filename));
+	write(1, FLUSH, 4);
+	ft_putchar('\n');
+}
+
+void		check_permissions(t_info *sinfo)
+{
+	write(1, "\n", 1);
+	write(1, sinfo->filepath, ft_strlen(sinfo->filepath));
+	write(1, ":\n", 2);
+	print_error_perm(sinfo->filename);
+}
 
 void		write_major_minor(t_info *sinfo)
 {

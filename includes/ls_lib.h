@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/07 23:54:32 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/08 05:18:07 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,21 @@ int					valid_options(char o, char *cmp_options);
 void				save_command(int ac, char **av, char *options);
 int					check_av(char **av, int ac);
 
+void				save_data1(t_info *sinfo, char *filename, t_boolean b);
+void				save_folders(char **f, t_opt opt);
+char				**folders_av(int ac, char **av, t_opt opt);
+int					count_dir(char *filename, char a);
+char				*create_treename(char *read, char *filename);
+
+void				save_data2(t_info *sinfo, char *filename, int nf, int tf);
+int					spec_file(int ac, char **av, t_opt opt, t_info *sinfo);
+int					files_count(char **av);
+void				end_specific_file(t_info *sinfo, t_opt opt, char **av);
+void				valid_file(char **av, int *x, int *ac);
+
 void				sort_command(t_info *sinfo, t_opt opt, t_boolean b);
 void				sort_by_r(t_info **sinfo);
-void				sort_recursive(t_info *sinfo);
+void				sort_recursive(t_info **sinfo, t_opt opt);
 void				check_permissions(t_info *sinfo);
 int					read_and_stat(t_info *sinfo, char *treename);
 
@@ -91,20 +103,9 @@ void				sort_time_folders(char **f);
 void				sort_by_time(t_info **sinfo);
 time_t				check_time(char *t);
 
-void				save_data1(t_info *sinfo, char *filename, t_boolean b);
-void				save_folders(char **f, t_opt opt);
-char				**folders_av(int ac, char **av, t_opt opt);
-int					count_dir(char *filename, char a);
-char				*create_treename(char *read, char *filename);
 
-void				save_data2(t_info *sinfo, char *filename, int nf, int tf);
 void				save_data2_lstat(t_info *sinfo, char *fn,
 					struct stat stats, int nf);
-int					spec_file(int ac, char **av, t_opt opt, t_info *sinfo);
-int					files_count(char **av);
-void				end_specific_file(t_info *sinfo, t_opt opt, char **av);
-void				valid_file(char **av, int *x, int *ac);
-
 void				set_data(t_info *sinfo, char *treename, char *name,
 					t_boolean b);
 void				set_lstat(t_info *sinfo, char *treename, char *name,
@@ -113,7 +114,6 @@ void				set_data_tree(t_info *sinfo, char *name, char *treename,
 					t_boolean b);
 void				set_types_name(t_info *sinfo, char *fp, char *dname,
 					struct stat stats);
-int					read_and_stat(t_info *sinfo, char *treename);
 
 void				set_rights_time(t_info *sinfo, struct stat stats);
 void				set_rights_usr_grp(t_info *sinfo, struct stat stats);
@@ -123,10 +123,11 @@ t_opt				set_options_zero(char *options);
 
 void				print_rec(t_info **sinfo, t_opt opt, t_boolean b);
 void				print_blocks(t_info *sinfo, t_opt opt);
-void				write_it_all(t_info *sinfo, t_opt opt);
 void				print_errors(char **av);
 void				print_error_perm(char *filename);
+void				print_tree(t_info *tmp, t_opt opt);
 
+void				write_it_all(t_info *sinfo, t_opt opt);
 void				write_major_minor(t_info *sinfo);
 void				write_pretty_colors(t_info *sinfo);
 void				more_pretty_colors(t_info *sinfo);
