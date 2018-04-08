@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:15:59 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 11:18:00 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/07 23:50:41 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void	set_data(t_info *sinfo, char *treename, char *name, t_boolean b)
 {
 	struct stat		stats;
 
+	if (read_and_stat(sinfo, treename) == 0)
+		return ;
 	stat(treename, &stats);
 	set_types_name(sinfo, treename, name, stats);
 	sinfo->filepath = (char*)malloc(sizeof(char) * ft_strlen(treename) + 1);
@@ -40,18 +42,16 @@ void	set_data(t_info *sinfo, char *treename, char *name, t_boolean b)
 
 void	set_data_tree(t_info *sinfo, char *name, char *treename, t_boolean b)
 {
-	DIR	*p;
+	DIR			*p;
 
 	if (sinfo->str_rights[0] == 'd' &&
 	(ft_strcmp(name, "..") != 0) && (ft_strcmp(name, ".") != 0) && b == 1)
 	{
 		if ((p = opendir(treename)) == NULL)
 		{
-			printf("bad dir\n");
 			sinfo->tree = NULL;
 			return ;
 		}
-		printf("good dir\n");
 		closedir(p);
 		sinfo->tree = (t_info*)malloc(sizeof(t_info));
 		save_data1(sinfo->tree, treename, b);

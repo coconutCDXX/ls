@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 06:28:38 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/08 00:00:59 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ void	set_uid_gid_size(t_info *sinfo, struct stat stats)
 	ft_strcpy(sinfo->grp_name, grp->gr_name);
 	sinfo->bytes = stats.st_size;
 	sinfo->device = FALSE;
-	if (sinfo->str_rights[0] == 'c')
+	if (sinfo->str_rights[0] == 'c' || sinfo->str_rights[0] == 'b')
 	{
 		sinfo->device = TRUE;
 		sinfo->bytes = major(stats.st_rdev);

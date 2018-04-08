@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 10:31:21 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/07 23:54:16 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,20 @@ void	sort_command(t_info *sinfo, t_opt opt, t_boolean b)
 	if (opt.cr == TRUE)
 		sort_recursive(sinfo);
 	print_rec(&sinfo, opt, b);
-	if (opt.l == TRUE)
-		check_permissions(sinfo);
+	// if (opt.l == TRUE)
+	// 	check_permissions(sinfo);
 	delete_me(sinfo);
+}
+
+int		read_and_stat(t_info *sinfo, char *treename)
+{
+	struct stat	stats;
+
+	if (stat(treename, &stats) == -1 && lstat(treename, &stats) != 0)
+		sinfo->read_and_stat = 0;
+	else
+		sinfo->read_and_stat = 1;
+	return (sinfo->read_and_stat);
 }
 
 void	check_permissions(t_info *sinfo)

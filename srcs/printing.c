@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 10:40:14 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/07 23:50:08 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@ void		print_rec(t_info **sinfo, t_opt opt, t_boolean b)
 	t_info *tmp;
 
 	tmp = *sinfo;
-	if (b == TRUE)
+	if (b == TRUE && tmp->read_and_stat != 0)
 		print_blocks(*sinfo, opt);
-	while (tmp)
+	while (tmp && tmp->read_and_stat != 0)
 	{
 		if (!(tmp->filename[0] == '.'))
 			write_it_all(tmp, opt);
@@ -30,7 +30,7 @@ void		print_rec(t_info **sinfo, t_opt opt, t_boolean b)
 	tmp = *sinfo;
 	while (tmp && opt.cr == TRUE)
 	{
-		if (tmp->tree != NULL)
+		if (tmp->tree != NULL && tmp->read_and_stat != 0)
 		{
 			write(1, "\n", 1);
 			write(1, tmp->filepath, ft_strlen(tmp->filepath));
@@ -65,6 +65,8 @@ void		print_blocks(t_info *sinfo, t_opt opt)
 
 void		write_it_all(t_info *sinfo, t_opt opt)
 {
+	if (sinfo->read_and_stat == 0)
+		return ;
 	if (opt.l == TRUE)
 	{
 		write(1, sinfo->str_rights, 10);

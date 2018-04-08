@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:24:05 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 11:24:42 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/07 23:51:24 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ void	save_data1(t_info *sinfo, char *filename, t_boolean b)
 	while ((read = readdir(p)) != NULL)
 	{
 		treename = create_treename(read->d_name, filename);
-		printf("wheres teh seg!!!fml {%s}{%s}{%d}\n", filename, read->d_name, sinfo->dir_cont);
 		set_data(sinfo, treename, read->d_name, b);
 		if (sinfo->dir_cont > 1)
 		{

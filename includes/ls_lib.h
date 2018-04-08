@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 10:09:04 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/07 23:54:32 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct		s_info
 {
 	int				block_cont;
 	int				dir_cont;
+	int				read_and_stat;
 	int				p_dir_cont;
 	char			*str_rights;
 	int				file_type;
@@ -76,10 +77,13 @@ int					check_av(char **av, int ac);
 
 void				sort_command(t_info *sinfo, t_opt opt, t_boolean b);
 void				sort_by_r(t_info **sinfo);
+void				sort_recursive(t_info *sinfo);
+void				check_permissions(t_info *sinfo);
+int					read_and_stat(t_info *sinfo, char *treename);
+
 void				sort_by_alpha(t_info **sinfo);
 int					check_alpha(char *a, char *b);
 int					check_alpha_bis(char x, char y);
-void				sort_recursive(t_info *sinfo);
 
 void				sort_folders(char **f, t_opt opt);
 void				sort_rev_folders(char **f);
@@ -109,6 +113,7 @@ void				set_data_tree(t_info *sinfo, char *name, char *treename,
 					t_boolean b);
 void				set_types_name(t_info *sinfo, char *fp, char *dname,
 					struct stat stats);
+int					read_and_stat(t_info *sinfo, char *treename);
 
 void				set_rights_time(t_info *sinfo, struct stat stats);
 void				set_rights_usr_grp(t_info *sinfo, struct stat stats);
@@ -121,7 +126,6 @@ void				print_blocks(t_info *sinfo, t_opt opt);
 void				write_it_all(t_info *sinfo, t_opt opt);
 void				print_errors(char **av);
 void				print_error_perm(char *filename);
-void				check_permissions(t_info *sinfo);
 
 void				write_major_minor(t_info *sinfo);
 void				write_pretty_colors(t_info *sinfo);
@@ -129,5 +133,6 @@ void				more_pretty_colors(t_info *sinfo);
 
 void				delete_me(t_info *sinfo);
 void				delete_array(char **d);
+void				delete_members(t_info *sinfo);
 
 #endif
