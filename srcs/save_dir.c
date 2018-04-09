@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:24:05 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/08 04:57:25 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/08 22:56:38 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,15 +121,18 @@ int		count_dir(char *filename, char a)
 	char			*treename;
 
 	i = 0;
+	if (a != 'x')
+	{
+		stat(treename, &stats);
+		return ((int)stats.st_nlink);
+	}
 	if ((p = opendir(filename)) == NULL)
 		return (0);
 	while ((read = readdir(p)) != NULL)
 	{
 		treename = create_treename(read->d_name, filename);
 		stat(treename, &stats);
-		if (a == 'x' || S_ISDIR(stats.st_mode))
-			i++;
-		//printf("[%d][%s][%s][%c]\n",i, filename, read->d_name, a);
+		i++;
 		ft_bzero(treename, ft_strlen(treename));
 		free(treename);
 	}

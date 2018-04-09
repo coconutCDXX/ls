@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/08 05:18:07 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/08 22:29:28 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void				valid_file(char **av, int *x, int *ac);
 
 void				sort_command(t_info *sinfo, t_opt opt, t_boolean b);
 void				sort_by_r(t_info **sinfo);
-void				sort_recursive(t_info **sinfo, t_opt opt);
+void				sort_recursive(t_info *sinfo, t_opt opt);
 void				check_permissions(t_info *sinfo);
 int					read_and_stat(t_info *sinfo, char *treename);
 
@@ -102,7 +102,6 @@ void				sort_rev_folders(char **f);
 void				sort_time_folders(char **f);
 void				sort_by_time(t_info **sinfo);
 time_t				check_time(char *t);
-
 
 void				save_data2_lstat(t_info *sinfo, char *fn,
 					struct stat stats, int nf);
