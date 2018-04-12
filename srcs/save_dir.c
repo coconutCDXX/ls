@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:24:05 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/12 04:43:22 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 04:56:02 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void	save_data1(t_info *sinfo, char *filename, t_boolean b)
 	DIR				*p;
 	char			*treename;
 
-	sinfo->dir_cont = count_dir(filename, 'x');
+	sinfo->dir_cont = count_dir(filename);
 	if (sinfo->dir_cont == 0)
 	{
 		print_error_perm(filename);
@@ -112,7 +112,7 @@ char	*create_treename(char *read, char *filename)
 	return (ret);
 }
 
-int		count_dir(char *filename, char a)
+int		count_dir(char *filename)
 {
 	DIR				*p;
 	struct dirent	*read;
@@ -121,7 +121,6 @@ int		count_dir(char *filename, char a)
 	char			*treename;
 
 	i = 0;
-	a = 'b';
 	if ((p = opendir(filename)) == NULL)
 		return (0);
 	while ((read = readdir(p)) != NULL)

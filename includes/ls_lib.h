@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/12 04:31:29 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 04:55:45 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int					check_av(char **av, int ac);
 void				save_data1(t_info *sinfo, char *filename, t_boolean b);
 void				save_folders(char **f, t_opt opt);
 char				**folders_av(int ac, char **av, t_opt opt);
-int					count_dir(char *filename, char a);
+int					count_dir(char *filename);
 char				*create_treename(char *read, char *filename);
 
 void				save_data2(t_info *sinfo, char *filename, int nf, int tf);

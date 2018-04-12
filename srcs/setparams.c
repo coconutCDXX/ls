@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/12 04:35:24 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 05:05:18 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,8 @@ void	set_rights_oth(t_info *sinfo, struct stat stats)
 		sinfo->str_rights[9] = 'x';
 	else
 		sinfo->str_rights[9] = '-';
+	if (stats.st_mode & S_ISVTX)
+		sinfo->str_rights[9] = 't';
 	sinfo->str_rights[10] = '\0';
 }
 
