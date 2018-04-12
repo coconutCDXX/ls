@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:45 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/08 22:28:57 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 00:34:24 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void		print_tree(t_info *tmp, t_opt opt)
 {
 	while (tmp && opt.cr == TRUE)
 	{
-		if (tmp->p_dir_cont == 0 || tmp->read_and_stat == 0)
+		if (tmp->p_dir_cont == 0 && tmp->read_and_stat == 0)
 			check_permissions(tmp);
 		if (opt.a == FALSE && tmp->filename[0] == '.')
 		{
