@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:42 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/08 00:00:59 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 04:35:24 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void	set_rights_oth(t_info *sinfo, struct stat stats)
 	sinfo->str_rights[10] = '\0';
 }
 
-void	set_uid_gid_size(t_info *sinfo, struct stat stats)
+void	set_uid_gid_size_links(t_info *sinfo, struct stat stats)
 {
 	struct passwd	*person;
 	struct group	*grp;
@@ -129,4 +129,5 @@ void	set_uid_gid_size(t_info *sinfo, struct stat stats)
 		sinfo->bytes = major(stats.st_rdev);
 		sinfo->minor = minor(stats.st_rdev);
 	}
+	sinfo->p_dir_cont = (int)stats.st_nlink;
 }

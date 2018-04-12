@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/12 03:08:25 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 04:31:29 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ void				set_types_name(t_info *sinfo, char *fp, char *dname,
 void				set_rights_time(t_info *sinfo, struct stat stats);
 void				set_rights_usr_grp(t_info *sinfo, struct stat stats);
 void				set_rights_oth(t_info *sinfo, struct stat stats);
-void				set_uid_gid_size(t_info *sinfo, struct stat stats);
+void				set_uid_gid_size_links(t_info *sinfo, struct stat stats);
 t_opt				set_options_zero(char *options);
 
 void				print_rec(t_info **sinfo, t_opt opt, t_boolean b);

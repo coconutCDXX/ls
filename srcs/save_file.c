@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:26:53 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/12 03:14:27 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 04:37:29 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 	stat(filename, &stats);
 	set_types_name(sinfo, filename, filename, stats);
 	set_rights_time(sinfo, stats);
-	set_uid_gid_size(sinfo, stats);
+	set_uid_gid_size_links(sinfo, stats);
 	sinfo->p_dir_cont = read_and_stat(sinfo, filename);
 	sinfo->tree = NULL;
 	if (nf == 1)

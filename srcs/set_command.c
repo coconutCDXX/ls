@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:15:59 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/12 03:44:54 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 04:43:00 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,7 @@ void	set_data(t_info *sinfo, char *treename, char *name, t_boolean b)
 		return ;
 	}
 	set_rights_time(sinfo, stats);
-	sinfo->p_dir_cont = 1;
-	if (sinfo->str_rights[0] == 'd')
-		sinfo->p_dir_cont = count_dir(treename, 'd');
-	set_uid_gid_size(sinfo, stats);
+	set_uid_gid_size_links(sinfo, stats);
 	set_data_tree(sinfo, name, treename, b);
 	if (treename != name)
 	{
@@ -50,6 +47,7 @@ void	set_data_tree(t_info *sinfo, char *name, char *treename, t_boolean b)
 		if ((p = opendir(treename)) == NULL)
 		{
 			sinfo->tree = NULL;
+			sinfo->read_and_stat = 0;
 			return ;
 		}
 		closedir(p);
@@ -66,10 +64,7 @@ void	set_lstat(t_info *sinfo, char *treename, char *name, t_boolean b)
 
 	lstat(treename, &stats);
 	set_rights_time(sinfo, stats);
-	sinfo->p_dir_cont = 1;
-	if (sinfo->str_rights[0] == 'd')
-		sinfo->p_dir_cont = count_dir(treename, sinfo->str_rights[0]);
-	set_uid_gid_size(sinfo, stats);
+	set_uid_gid_size_links(sinfo, stats);
 	set_data_tree(sinfo, name, treename, b);
 	if (treename != name)
 	{
@@ -88,7 +83,6 @@ int		save_data2_lstat(t_info *sinfo, char *fn, int nf)
 	{
 		set_types_name(sinfo, fn, fn, stats);
 		set_lstat(sinfo, fn, fn, 0);
-		sinfo->p_dir_cont = read_and_stat(sinfo, fn);
 		if (nf == 1)
 			sinfo->next = NULL;
 		sinfo->tree = NULL;

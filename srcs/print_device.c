@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/06 06:27:50 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/08 01:33:23 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 04:41:23 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 void		write_it_all(t_info *sinfo, t_opt opt)
 {
-	if (sinfo->read_and_stat == 0)
-		return ;
 	if (opt.l == TRUE)
 	{
 		write(1, sinfo->str_rights, 10);
