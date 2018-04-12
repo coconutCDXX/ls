@@ -35,7 +35,7 @@ $(BUILDDIR)%.o:$(SRCDIR)%.c
 	$(CC) $(DEBUG) $(CFLAGS) -I$(LIBINC) -I$(INC) -o $@ -c $<
 
 # Project file rule
-$(NAME): $(BUILDOBJS)
+$(NAME): $(BUILDDIR) $(LIBFT) $(BUILDOBJS)
 	$(CC) $(OPFLAGS) $(CFLAGS) -o $(NAME) $(BUILDOBJS) $(LIBFT)
 
 # Libft rule
