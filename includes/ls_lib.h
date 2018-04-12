@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 16:07:14 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/08 22:29:28 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 03:08:25 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,7 @@ void				sort_time_folders(char **f);
 void				sort_by_time(t_info **sinfo);
 time_t				check_time(char *t);
 
-void				save_data2_lstat(t_info *sinfo, char *fn,
-					struct stat stats, int nf);
+int					save_data2_lstat(t_info *sinfo, char *fn, int nf);
 void				set_data(t_info *sinfo, char *treename, char *name,
 					t_boolean b);
 void				set_lstat(t_info *sinfo, char *treename, char *name,

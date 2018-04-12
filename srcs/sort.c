@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/28 14:35:35 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/08 22:39:22 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 03:45:24 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,9 @@ int		read_and_stat(t_info *sinfo, char *treename)
 		sinfo->p_dir_cont = 1;
 	}
 	else
+	{
 		sinfo->read_and_stat = 1;
+	}
 	return (sinfo->read_and_stat);
 }
 

@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:15:59 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/12 01:08:47 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 03:44:54 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,15 +78,23 @@ void	set_lstat(t_info *sinfo, char *treename, char *name, t_boolean b)
 	}
 }
 
-void	save_data2_lstat(t_info *sinfo, char *fn, struct stat stats, int nf)
+int		save_data2_lstat(t_info *sinfo, char *fn, int nf)
 {
-	set_types_name(sinfo, fn, fn, stats);
+	struct stat stats;
+
 	sinfo->filepath = (char*)malloc(sizeof(char) * ft_strlen(fn) + 1);
 	ft_strcpy(sinfo->filepath, fn);
-	set_lstat(sinfo, fn, fn, 0);
-	if (nf == 1)
-		sinfo->next = NULL;
-	sinfo->tree = NULL;
+	if (lstat(fn, &stats) == 0 && (S_ISLNK(stats.st_mode)))
+	{
+		set_types_name(sinfo, fn, fn, stats);
+		set_lstat(sinfo, fn, fn, 0);
+		sinfo->p_dir_cont = read_and_stat(sinfo, fn);
+		if (nf == 1)
+			sinfo->next = NULL;
+		sinfo->tree = NULL;
+		return (1);
+	}
+	return (0);
 }
 
 void	set_types_name(t_info *sinfo, char *fp, char *dname, struct stat stats)

@@ -6,7 +6,7 @@
 /*   By: cwartell <cwartell@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/04/05 02:26:53 by cwartell          #+#    #+#             */
-/*   Updated: 2018/04/06 05:33:35 by cwartell         ###   ########.fr       */
+/*   Updated: 2018/04/12 03:14:27 by cwartell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,8 @@ int		spec_file(int ac, char **av, t_opt opt, t_info *sinfo)
 	while (ac > 1)
 	{
 		valid_file(av, &x, &ac);
-		if (!(stat(av[x], &stats)) || !(lstat(av[x], &stats)))
+		if ((!(stat(av[x], &stats)) || !(lstat(av[x], &stats)))
+		&& !(S_ISDIR(stats.st_mode)))
 		{
 			save_data2(sinfo, av[x], nonf, totalnf);
 			nonf--;
@@ -96,16 +97,13 @@ void	save_data2(t_info *sinfo, char *filename, int nf, int tf)
 		sinfo->next = (t_info*)malloc(sizeof(t_info));
 		sinfo = sinfo->next;
 	}
-	if (lstat(filename, &stats) == 0 && (S_ISLNK(stats.st_mode)))
-	{
-		save_data2_lstat(sinfo, filename, stats, nf);
+	if (save_data2_lstat(sinfo, filename, nf))
 		return ;
-	}
 	stat(filename, &stats);
 	set_types_name(sinfo, filename, filename, stats);
 	set_rights_time(sinfo, stats);
 	set_uid_gid_size(sinfo, stats);
-	sinfo->p_dir_cont = 1;
+	sinfo->p_dir_cont = read_and_stat(sinfo, filename);
 	sinfo->tree = NULL;
 	if (nf == 1)
 		sinfo->next = NULL;
